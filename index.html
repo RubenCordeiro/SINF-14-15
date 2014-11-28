@@ -13,10 +13,10 @@
     </style>
 
     <link href="/css/preview-frame.css" rel="stylesheet">
-    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="/lib/ionic.css" rel="stylesheet">
 
     <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="/lib/ionic.bundle.js"></script>
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
@@ -74,6 +74,16 @@ angular.module('app', ['ionic'])
       url: '/shipping1',
       templateUrl: 'page10.html'
     })
+    
+    .state('page13', {
+      url: '/putaway',
+      templateUrl: 'page13.html'
+    })
+    
+    .state('page14', {
+      url: '/home',
+      templateUrl: 'page14.html'
+    })
     ;
 
   // if none of the above states are matched, use this as the fallback
@@ -96,7 +106,7 @@ angular.module('app', ['ionic'])
     </div>
 </div>
 <script id="page9.html" type="text/ng-template">
-<ion-view title="Orders">
+<ion-view title="Orders (Picking)">
     <ion-content padding="true" class="has-header">
         <ion-list></ion-list>
         <ion-list>
@@ -118,7 +128,6 @@ angular.module('app', ['ionic'])
                 <h2>Tubs</h2>
                 <p>SomeUser, Mirandela</p>
                 <div class="button-bar"></div>
-                <button class="button  button-block">Select</button>
             </ion-item>
             <ion-item class="item-divider">Delivered</ion-item>
             <ion-item>Buckets
@@ -175,7 +184,7 @@ angular.module('app', ['ionic'])
                 </label>
             </ion-list>
             <div class="spacer" style="height: 40px;"></div>
-            <a href="#/orders" class="button button-stable button-block">Log in</a>
+            <a href="#/home" class="button button-stable button-block">Log in</a>
             <a href="#/signup" class="button button-positive button-clear button-block">Or create an account</a>
         </form>
     </ion-content>
@@ -183,7 +192,7 @@ angular.module('app', ['ionic'])
 <script id="page10.html" type="text/ng-template">
 <ion-view title="Shipping 1">
     <ion-tabs class="tabs-stable tabs-icon-top">
-        <ion-tab title="Tab" icon="ion-android-note">
+        <ion-tab title="Tab" icon="null">
             <ion-content padding="true" class="has-header">
                 <form>
                     <ion-list></ion-list>
@@ -225,6 +234,43 @@ angular.module('app', ['ionic'])
             <ion-content padding="true" class="has-header"></ion-content>
         </ion-tab>
     </ion-tabs>
+</ion-view></script>
+<script id="page13.html" type="text/ng-template">
+<ion-view title="Putaway">
+    <ion-content padding="true" class="has-header">
+        <div class="button-bar"></div>
+        <ion-list>
+            <ion-toggle toggle-class="toggle-positive">Automatic</ion-toggle>
+            <ion-item class="item-divider">Pending</ion-item>
+            <ion-checkbox>Order 1</ion-checkbox>
+            <ion-checkbox>Order 2</ion-checkbox>
+            <ion-checkbox>Order 3</ion-checkbox>
+        </ion-list>
+        <div class="button-bar"></div>
+        <button class="button button-dark button-block">Process</button>
+        <div class="list card">
+            <div class="item item-divider">Help</div>
+            <div class="item item-body">
+                <div>
+                    <p>
+                        <strong>Automatic</strong>mode: orders are selected automatically
+                        <br>
+                        <strong>Manual</strong>mode: select orders to putaway</p>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view></script>
+<script id="page14.html" type="text/ng-template">
+<ion-view title="Home">
+    <ion-content padding="true" class="has-header">
+        <a href="#/orders" class="button button-balanced button-block">Orders (picking)</a>
+        <a href="#/putaway" class="button button-assertive button-block">Putaway</a>
+        <div class="list card">
+            <div class="item item-divider">Actions</div>
+            <div class="item item-body"></div>
+        </div>
+    </ion-content>
 </ion-view></script>
   </body>
 </html>
