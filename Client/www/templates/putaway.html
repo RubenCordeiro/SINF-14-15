@@ -1,0 +1,25 @@
+<ion-view title="Putaway | Pickervera">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content padding="true" class="has-header">
+        <div class="button-bar"></div>
+        <ion-list>
+            <ion-toggle ng-model="automatic" ng-change="automaticChange()" toggle-class="toggle-positive">Automatic</ion-toggle>
+            <ion-checkbox class="animate-repeat" ng-repeat="order in orders" ng-model="order.checked"
+                          ng-checked="order.checked" ng-disabled="automatic">
+                <h2>{{order.Id}}</h2>
+                <span class="item-note">
+                    {{order.Processed}}% complete
+                </span>
+                <p>{{order.Entity}}</p>
+            </ion-checkbox>
+        </ion-list>
+        <div class="button-bar"></div>
+        <button class="button button-dark button-block">Process</button>
+
+    </ion-content>
+    <div class="bar bar-footer">
+        <button class="button icon ion-information-circled pull-right" ng-click="showHelp()"></button>
+    </div>
+</ion-view>

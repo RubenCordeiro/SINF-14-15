@@ -1,0 +1,24 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0" is_locked="false">
+    <option name="myName" value="Project Default" />
+    <option name="myLocal" value="false" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="6">
+            <item index="0" class="java.lang.String" itemvalue="animation" />
+            <item index="1" class="java.lang.String" itemvalue="class" />
+            <item index="2" class="java.lang.String" itemvalue="ng-checked" />
+            <item index="3" class="java.lang.String" itemvalue="ng-disabled" />
+            <item index="4" class="java.lang.String" itemvalue="ng-model" />
+            <item index="5" class="java.lang.String" itemvalue="ng-change" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="RequiredAttributes" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myAdditionalRequiredHtmlAttributes" value="class" />
+    </inspection_tool>
+  </profile>
+</component>
