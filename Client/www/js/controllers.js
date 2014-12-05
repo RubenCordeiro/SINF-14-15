@@ -42,20 +42,21 @@ angular.module('sinfApp.controllers', [])
     })
 
     .controller('PutawayCtrl', function ($scope, $ionicPopup) {
-        $scope.automatic = false;
 
         $scope.orders = [
-            { checked: false, Id: 'Order 1', Entity: 'EMP1', Date: '2014/12/04T14:50', Processed: 0 },
-            { checked: true, Id: 'Order 1', Entity: 'EMP2', Date: '2014/12/04T14:50', Processed: 50 },
-            { checked: false, Id: 'Order 2', Entity: 'EMP3', Date: '2014/12/04T14:50', Processed: 80 }
+            { checked: false, Id: 'Order 1', Entity: 'EMP1', Date: '2014-12-04T20:40Z', Processed: 0 },
+            { checked: true, Id: 'Order 2', Entity: 'EMP2', Date: '2014-12-04T10:50Z', Processed: 50 },
+            { checked: false, Id: 'Order 3', Entity: 'EMP3', Date: '2014-12-01T14:50Z', Processed: 80 }
         ];
 
-        $scope.automaticChange = function () {
-            console.log('automaticChange: ' + $scope.automatic);
+        $scope.automaticChange = function (val) {
             for (var i = 0; i < $scope.orders.length; ++i) {
-                $scope.orders[i].checked = $scope.automatic;
+                $scope.orders[i].checked = val;
             }
         };
+
+        $scope.search = { Id: '', Entity: '', $:''};
+        $scope.filterType = 'Id';
 
         $scope.showHelp = function() {
             $ionicPopup.alert({
