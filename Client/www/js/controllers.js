@@ -73,12 +73,21 @@ angular.module('sinfApp.controllers', [])
         ];
 
         $scope.items[0].disabled = false;
+        $scope.enableFinish = false;
 
         $scope.itemChecked = function (id ) {
             $scope.items[id].disabled = true;
 
             if (id + 1 < $scope.items.length) {
                 $scope.items[id + 1].disabled = false;
+            }
+
+            $scope.enableFinish = true;
+            for (var i = 0; i < $scope.items.length; ++i) {
+                if (!$scope.items[i].checked) {
+                    $scope.enableFinish = false;
+                    break;
+                }
             }
         };
     })
@@ -119,12 +128,21 @@ angular.module('sinfApp.controllers', [])
         ];
 
         $scope.items[0].disabled = false;
+        $scope.enableFinish = false;
 
         $scope.itemChecked = function (id ) {
             $scope.items[id].disabled = true;
 
             if (id + 1 < $scope.items.length) {
                 $scope.items[id + 1].disabled = false;
+            }
+
+            $scope.enableFinish = true;
+            for (var i = 0; i < $scope.items.length; ++i) {
+                if (!$scope.items[i].checked) {
+                    $scope.enableFinish = false;
+                    break;
+                }
             }
         };
     });
