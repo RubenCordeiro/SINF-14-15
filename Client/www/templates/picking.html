@@ -3,38 +3,47 @@
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
     <ion-content padding="true" class="has-header">
-        <label class="item item-input">
-            <i class="icon ion-search placeholder-icon"></i>
-            <input type="search" placeholder="Filter orders">
-        </label>
+        <div class="button-bar"></div>
         <ion-list>
-            <ion-item class="item-divider">Pending Orders
-                <a href="#/app/shipping1" class="button button-dark button-block">Pick Selected</a>
-            </ion-item>
-            <ion-checkbox>
-                <h2>Grape Picking Buckets</h2>
-                    <span class="item-note">
-                        4 of 4 items
-                    </span>
-                <p>SomeCompany, Lda., Viseu</p>
+            <ion-toggle ng-model="automatic" ng-change="automaticChange(automatic)" toggle-class="toggle-positive">Automatic</ion-toggle>
+            <div class="item item-input item-select">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="search" placeholder="Filter orders" ng-model="search[filterType]">
+                <select ng-model="filterType">
+                    <option selected>Id</option>
+                    <option>Entity</option>
+                </select>
+            </div>
+            <ion-item class="item-divider">Pending Orders</ion-item>
+            <ion-checkbox class="animate-repeat" ng-repeat="order in orders | filter:search" ng-model="order.checked"
+                          ng-checked="order.checked" ng-disabled="automatic">
+                <h2>{{order.Id}}</h2>
+                <span class="item-note">
+                    {{order.Processed}}% complete
+                </span>
 
+                <p>{{order.Entity}} - {{order.Date | amCalendar}} <!--<small>({{order.Date | amDateFormat:'YYYY-MM-DD HH:mm'}})</small>--></p>
             </ion-checkbox>
-            <ion-checkbox>
-                <h2>Tubs</h2>
-                    <span class="item-note">
-                        2 of 3 items
-                    </span>
-                <p>SomeUser, Mirandela</p>
-            </ion-checkbox>
-            <ion-item class="item-divider">Delivered</ion-item>
-            <ion-item>Buckets
-                <br>
-                <small>21th Nov - Lisbon</small>
+            <a href="#/app/picking/PCK1" class="button button-dark button-block">Pick Selected</a>
+        </ion-list>
+        <p></p>
+        <ion-list>
+            <ion-toggle ng-model="showDelivered" toggle-class="toggle-positive">Show Delivered</ion-toggle>
+            <ion-item class="item-divider" ng-show="showDelivered">
+                Delivered
+            </ion-item>
+            <ion-item class="animate-repeat" ng-repeat="order in orders" ng-show="showDelivered">
+                <h2>{{order.Id}}</h2>
+
+                <span class="item-note">
+                    {{order.Date | amDateFormat:'YYYY-MM-DD HH:mm'}}
+                </span>
+                <p>{{order.Entity}}</p>
+
             </ion-item>
         </ion-list>
-        <ion-item>More Buckets
-            <br>
-            <small>20th Nov - Porto</small>
-        </ion-item>
     </ion-content>
+    <div class="bar bar-footer">
+        <button class="button icon ion-information-circled pull-right" ng-click="showHelp()"></button>
+    </div>
 </ion-view>

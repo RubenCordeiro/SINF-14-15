@@ -50,6 +50,16 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers'])
                 }
             })
 
+            .state('app.pickingResult', {
+                url: '/picking/:pickingId',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/pickingResult.html',
+                        controller: 'PickingResultCtrl'
+                    }
+                }
+            })
+
             .state('app.putaway', {
                 url: '/putaway',
                 views: {
