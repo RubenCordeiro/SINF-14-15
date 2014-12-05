@@ -68,6 +68,16 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers'])
                         controller: 'PutawayCtrl'
                     }
                 }
+            })
+
+            .state('app.putawayResult', {
+                url: '/putaway/:putawayId',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/putawayResult.html',
+                        controller: 'PutawayResultCtrl'
+                    }
+                }
             });
 
         // if none of the above states are matched, use this as the fallback
