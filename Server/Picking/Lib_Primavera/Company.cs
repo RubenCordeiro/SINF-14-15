@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Interop.ErpBS800;
+using Interop.GcpBE800;
 using Interop.StdBE800;
 using Interop.StdPlatBS800;
 using Picking.Lib_Primavera.Model;
@@ -242,6 +243,54 @@ namespace Picking.Lib_Primavera
             return listDv;
         }
 
+        public List<ItemStock> ListItemStock()
+        {
+            EnsureInitialized();
+
+            var result = new List<ItemStock>();
+
+            for (
+                var objItemStocksList =
+                    _engine.Consulta("SELECT Artigo, Armazem, StkActual, Localizacao FROM ArtigoArmazem");
+                !objItemStocksList.NoFim();
+                objItemStocksList.Seguinte())
+            {
+                result.Add(new ItemStock
+                {
+                    Item = objItemStocksList.Valor("Artigo"),
+                    Stock = objItemStocksList.Valor("StkActual"),
+                    StorageFacility = objItemStocksList.Valor("Armazem"),
+                    StorageLocation = objItemStocksList.Valor("Localizacao"),
+                });
+            }
+
+            return result;
+        }
+
+        public bool CreateStorageTransferDocument(Order order)
+        {
+            EnsureInitialized();
+
+            // _engine.Comercial.Stocks.
+            var doc = new GcpBEDocumentoStock();
+            doc.set_Tipodoc("TRA");
+            doc.set_ArmazemOrigem("A1"); // TODO: ArmazemOrigem comes from Order ? or from parameters
+
+            var lines = new GcpBELinhasDocumentoStock();
+            
+            foreach (var orderLine in order.OrderLines)
+            {
+                _engine.Comercial.Stocks.AdicionaLinha(doc, orderLine.ItemId, "", orderLine.Quantity, "A1",
+                    orderLine.UnitPrice, orderLine.Discount, "", "A1.S1.P3");
+            }
+
+            _engine.IniciaTransaccao();
+            _engine.Comercial.Stocks.Actualiza(doc);
+            _engine.TerminaTransaccao();
+
+            return true;
+        }
+
         private void EnsureInitialized()
         {
             if (!_initialized) throw new Exception("Company not initialized!");
@@ -251,5 +300,7 @@ namespace Picking.Lib_Primavera
         private string _name;
         private readonly StdPlatBS _platform = new StdPlatBS();
         private readonly ErpBS _engine = new ErpBS();
+
+        public ErpBS Engine { get { return _engine;  } }
     }
 }

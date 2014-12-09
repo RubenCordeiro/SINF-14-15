@@ -250,14 +250,18 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\HelloController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
     <Compile Include="Controllers\LocationsController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Controllers\PickingListsController.cs" />
+    <Compile Include="Controllers\StocksController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Lib_Primavera\Company.cs" />
     <Compile Include="Lib_Primavera\Model\Item.cs" />
+    <Compile Include="Lib_Primavera\Model\ItemStock.cs" />
     <Compile Include="Lib_Primavera\Model\Order.cs" />
     <Compile Include="Lib_Primavera\Model\OrderLine.cs" />
     <Compile Include="Lib_Primavera\Model\StorageLocation.cs" />
