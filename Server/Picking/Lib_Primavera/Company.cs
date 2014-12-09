@@ -195,8 +195,7 @@ namespace Picking.Lib_Primavera
             EnsureInitialized();
 
             var objListCab =
-                _engine.Consulta("SELECT id, Entidade, Data, NumDoc, TotalMerc, Serie FROM CabecDoc where TipoDoc='ECL'");
-
+                _engine.Consulta("SELECT id, Entidade, Clientes.Nome as EntidadeNome, Data, NumDoc, TotalMerc, Serie FROM CabecDoc INNER JOIN Clientes ON Clientes.Cliente = CabecDoc.Entidade where TipoDoc='ECL'");
 
             var listDv = new List<Order>();
 
@@ -206,6 +205,7 @@ namespace Picking.Lib_Primavera
                 {
                     Id = objListCab.Valor("id"),
                     Entity = objListCab.Valor("Entidade"),
+                    EntityName = objListCab.Valor("EntidadeNome"),
                     NumDoc = objListCab.Valor("NumDoc"),
                     Data = objListCab.Valor("Data"),
                     TotalMerc = objListCab.Valor("TotalMerc"),

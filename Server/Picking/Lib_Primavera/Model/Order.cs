@@ -9,6 +9,8 @@ namespace Picking.Lib_Primavera.Model
 
         public string Entity { get; set; }
 
+        public string EntityName { get; set; }
+
         public int NumDoc { get; set; }
 
         public DateTime Data { get; set; }

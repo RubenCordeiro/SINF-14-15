@@ -17,12 +17,13 @@
             <ion-item class="item-divider">Pending Orders</ion-item>
             <ion-checkbox class="animate-repeat" ng-repeat="order in orders | filter:search" ng-model="order.checked"
                           ng-checked="order.checked" ng-disabled="automatic">
-                <h2>{{order.Id}}</h2>
+                <h2>Serie {{order.Serie}}, Nº {{order.NumDoc}}</h2>
                 <span class="item-note">
+                    {{order.TotalMerc | currency:"&euro;"}}<br>
                     {{order.Processed}}% complete
                 </span>
 
-                <p>{{order.Entity}} - {{order.Date | amCalendar}} <!--<small>({{order.Date | amDateFormat:'YYYY-MM-DD HH:mm'}})</small>--></p>
+                <p>{{order.EntityName}} - {{order.Data | amCalendar}} <!--<small>({{order.Data | amDateFormat:'YYYY-MM-DD HH:mm'}})</small>--></p>
             </ion-checkbox>
             <a href="#/app/picking/PCK1" class="button button-dark button-block">Pick Selected</a>
         </ion-list>

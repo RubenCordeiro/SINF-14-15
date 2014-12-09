@@ -37,12 +37,21 @@ angular.module('sinfApp.controllers', [])
 
     })
 
-    .controller('PickingCtrl', function ($scope, $ionicPopup) {
+    .controller('PickingCtrl', function ($scope, $ionicPopup, Restangular) {
+
+        /*
         $scope.orders = [
             { checked: false, Id: 'Order 1', Entity: 'EMP1', Date: '2014-12-04T20:40Z', Processed: 0 },
             { checked: true, Id: 'Order 2', Entity: 'EMP2', Date: '2014-12-04T10:50Z', Processed: 50 },
             { checked: false, Id: 'Order 3', Entity: 'EMP3', Date: '2014-12-01T14:50Z', Processed: 80 }
-        ];
+        ]; */
+
+
+        $scope.orders = Restangular.all('orders').getList().$object;
+
+        $scope.$watch($scope.orders, function() {
+            console.log("orders: ", JSON.stringify($scope.orders));
+        });
 
         $scope.automaticChange = function (val) {
             for (var i = 0; i < $scope.orders.length; ++i) {
