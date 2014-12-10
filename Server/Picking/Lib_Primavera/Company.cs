@@ -120,6 +120,21 @@ namespace Picking.Lib_Primavera
             };
         }
 
+        public List<string> ListStorageFacilities()
+        {
+            EnsureInitialized();
+
+            var result = new List<string>();
+            for (var objFacilities = _engine.Comercial.Armazens.LstArmazens();
+                    !objFacilities.NoFim();
+                    objFacilities.Seguinte())
+            {
+                result.Add(objFacilities.Valor("Armazem"));
+            }
+
+            return result;
+        }
+
         public List<StorageLocation> ListStorageLocations()
         {
             EnsureInitialized();
@@ -143,7 +158,7 @@ namespace Picking.Lib_Primavera
             return result;
         } 
 
-        public Order GetOrder(string numdoc)
+        public Order GetOrder(int numdoc)
         {
             EnsureInitialized();
 

@@ -51,7 +51,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
             })
 
             .state('app.pickingResult', {
-                url: '/picking/:pickingId',
+                url: '/pickingResult',
                 views: {
                     'menuContent': {
                         templateUrl: 'templates/pickingResult.html',
@@ -84,4 +84,16 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         $urlRouterProvider.otherwise('/app/home');
 
         RestangularProvider.setBaseUrl("http://localhost/Picking/api");
+    })
+
+    .service('pickingListService', function () {
+        var pickingList = {};
+
+        this.set = function(data) {
+            pickingList = data;
+        };
+
+        this.get = function() {
+            return pickingList;
+        };
     });

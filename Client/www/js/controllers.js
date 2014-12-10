@@ -37,21 +37,21 @@ angular.module('sinfApp.controllers', [])
 
     })
 
-    .controller('PickingCtrl', function ($scope, $ionicPopup, Restangular) {
-
-        /*
-        $scope.orders = [
-            { checked: false, Id: 'Order 1', Entity: 'EMP1', Date: '2014-12-04T20:40Z', Processed: 0 },
-            { checked: true, Id: 'Order 2', Entity: 'EMP2', Date: '2014-12-04T10:50Z', Processed: 50 },
-            { checked: false, Id: 'Order 3', Entity: 'EMP3', Date: '2014-12-01T14:50Z', Processed: 80 }
-        ]; */
-
+    .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService) {
 
         $scope.orders = Restangular.all('orders').getList().$object;
+        $scope.warehouses = {};
 
-        $scope.$watch($scope.orders, function() {
-            console.log("orders: ", JSON.stringify($scope.orders));
-        });
+        $scope.init = function () {
+            Restangular.all('storagefacilities').getList().then(function (data) {
+                $scope.warehouses = data;
+                if ($scope.warehouses.length > 0) {
+                    $scope.selectedWarehouse = $scope.warehouses[0];
+                }
+            })
+        };
+
+
 
         $scope.automaticChange = function (val) {
             for (var i = 0; i < $scope.orders.length; ++i) {
@@ -62,26 +62,47 @@ angular.module('sinfApp.controllers', [])
         $scope.search = { Id: '', Entity: '', $:''};
         $scope.filterType = 'Id';
 
+        $scope.anySelectedOrder = function () {
+            return _.any($scope.orders, function (order) {
+                return order.checked;
+            });
+        };
+
         $scope.showHelp = function() {
             $ionicPopup.alert({
                 title: 'Help Text',
                 template: '<p><strong>Automatic</strong> mode: orders are selected automatically<br><strong>Manual</strong> mode: select orders to putaway</p>'
             });
         };
+
+        $scope.pickSelected = function() {
+
+            var checkedOrders = _.filter($scope.orders, function (order) {
+                return order.checked;
+            });
+
+            var checkedOrdersIds = _.pluck(checkedOrders, 'NumDoc');
+
+            pickingListService.set(checkedOrdersIds);
+            $state.go('app.pickingResult');
+        };
     })
 
-    .controller('PickingResultCtrl', function ($scope, $stateParams) {
-        $scope.title = $stateParams.pickingId;
+    .controller('PickingResultCtrl', function ($scope, $stateParams, pickingListService, Restangular) {
+        $scope.title = /*$stateParams.pickingId*/ 'Picking List';
 
-        $scope.items = [
-            { checked: false, disabled: true, ItemId: 'IT1', Quantity: 11.2, Unit: 'kg',  StorageFacility: 'A1', StorageLocation: 'A1S1.1' },
-            { checked: false, disabled: true, ItemId: 'IT2', Quantity: 2,    Unit: 'SKU', StorageFacility: 'A1', StorageLocation: 'A1S4.1' },
-            { checked: false, disabled: true, ItemId: 'IT3', Quantity: 13,   Unit: 'm',   StorageFacility: 'A1', StorageLocation: 'A1S2.3' },
-            { checked: false, disabled: true, ItemId: 'IT4', Quantity: 10,   Unit: 'SKU', StorageFacility: 'A1', StorageLocation: 'A1S2.2' },
-            { checked: false, disabled: true, ItemId: 'IT5', Quantity: 115,  Unit: 'g',   StorageFacility: 'A1', StorageLocation: 'A1S2.1' }
-        ];
+        $scope.items = {};
 
-        $scope.items[0].disabled = false;
+        $scope.init = function () {
+            Restangular.all('pickinglists').post(pickingListService.get()).then(function (data) {
+                $scope.items = data;
+
+                if ($scope.items.length > 0) {
+                    $scope.items[0].disabled = false;
+                }
+            });
+        };
+
         $scope.enableFinish = false;
 
         $scope.itemChecked = function (id ) {

@@ -1,4 +1,4 @@
-<ion-view title="Picking | Pickervera">
+<ion-view title="Picking | Pickervera" ng-init="init()">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
@@ -25,7 +25,13 @@
 
                 <p>{{order.EntityName}} - {{order.Data | amCalendar}} <!--<small>({{order.Data | amDateFormat:'YYYY-MM-DD HH:mm'}})</small>--></p>
             </ion-checkbox>
-            <a href="#/app/picking/PCK1" class="button button-dark button-block">Pick Selected</a>
+            <label class="item item-input item-select">
+                <div class="input-label">
+                    Warehouse
+                </div>
+                <select ng-model="selectedWarehouse" ng-options="wh for wh in warehouses"></select>
+            </label>
+            <button ng-click="pickSelected()" ng-disabled="!anySelectedOrder()" class="button button-dark button-block">Pick Selected</button>
         </ion-list>
         <p></p>
         <ion-list>

@@ -21,7 +21,7 @@ namespace Picking.Controllers
         }
 
         // GET: /orders/id
-        public Order Get(string id)
+        public Order Get(int id)
         {
             var docvenda = _company.GetOrder(id);
             if (docvenda == null)
