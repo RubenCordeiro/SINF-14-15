@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using ADODB;
 using Interop.ErpBS800;
 using Interop.GcpBE800;
 using Interop.StdBE800;
 using Interop.StdPlatBS800;
 using Picking.Lib_Primavera.Model;
+// ReSharper disable UseIndexedProperty
 
 namespace Picking.Lib_Primavera
 {
@@ -61,6 +65,8 @@ namespace Picking.Lib_Primavera
                 "Default",
                 ref blnModoPrimario
                 );
+
+            _connection = _platform.BaseDados.AbreBaseDadosADO("Default", "PRI" + _name);
 
             _initialized = true;
 
@@ -205,6 +211,18 @@ namespace Picking.Lib_Primavera
             return dv;
         }
 
+        public int ExecuteQuery(string query, params object[] objs)
+        {
+            return ExecuteQuery(string.Format(query, objs));
+        }
+
+        public int ExecuteQuery(string query)
+        {
+            object count;
+            _connection.Execute(query, out count);
+            return (int) count;
+        }
+
         public List<Order> ListOrders()
         {
             EnsureInitialized();
@@ -315,6 +333,7 @@ namespace Picking.Lib_Primavera
         private string _name;
         private readonly StdPlatBS _platform = new StdPlatBS();
         private readonly ErpBS _engine = new ErpBS();
+        private Connection _connection;
 
         public ErpBS Engine { get { return _engine;  } }
     }

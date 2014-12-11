@@ -33,8 +33,22 @@ angular.module('sinfApp.controllers', [])
         };
     })
 
-    .controller('HomeCtrl', function ($scope) {
+    .controller('HomeCtrl', function ($scope, Restangular, $ionicPopup) {
+        $scope.setPicked0 = function () {
+            Restangular.one('debug').get({ action: 'reset_picked' }).then(function (data) {
+                $ionicPopup.alert({
+                    template: JSON.stringify(data)
+                });
+            });
+        };
 
+        $scope.setPicked1 = function () {
+            Restangular.one('debug').get({ action: 'set_picked' }).then(function (data) {
+                $ionicPopup.alert({
+                    template: JSON.stringify(data)
+                });
+            });
+        };
     })
 
     .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService) {
