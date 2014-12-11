@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Picking", "Picking\Picking.csproj", "{548C0FC6-A030-4E82-B5A8-2849908981D1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Picking.Tests", "Picking.Tests\Picking.Tests.csproj", "{CE2FE53E-0341-41AA-A444-0FF242D5D995}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{548C0FC6-A030-4E82-B5A8-2849908981D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{548C0FC6-A030-4E82-B5A8-2849908981D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{548C0FC6-A030-4E82-B5A8-2849908981D1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE2FE53E-0341-41AA-A444-0FF242D5D995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE2FE53E-0341-41AA-A444-0FF242D5D995}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE2FE53E-0341-41AA-A444-0FF242D5D995}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE2FE53E-0341-41AA-A444-0FF242D5D995}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
