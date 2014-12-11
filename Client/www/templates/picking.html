@@ -29,7 +29,7 @@
                 <div class="input-label">
                     Warehouse
                 </div>
-                <select ng-model="selectedWarehouse" ng-options="wh for wh in warehouses"></select>
+                <select ng-model="warehouse.name" ng-options="wh for wh in warehouses"></select>
             </label>
             <button ng-click="pickSelected()" ng-disabled="!anySelectedOrder()" class="button button-dark button-block">Pick Selected</button>
         </ion-list>

@@ -87,13 +87,15 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
     })
 
     .service('pickingListService', function () {
-        var pickingList = {};
+        var orders = {};
+        var facility = '';
 
-        this.set = function(data) {
-            pickingList = data;
+        this.set = function(o, f) {
+            orders = o;
+            facility = f;
         };
 
         this.get = function() {
-            return pickingList;
+            return { Orders: orders, Facility: facility };
         };
     });

@@ -186,7 +186,7 @@ namespace Picking.Lib_Primavera
             var listlindv = new List<OrderLine>();           
             
             var objListLin = _engine.Consulta(
-                "SELECT idCabecDoc, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasDoc where IdCabecDoc='" +
+                "SELECT idCabecDoc, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Picked from LinhasDoc where IdCabecDoc='" +
                 dv.Id + "' order By NumLinha");
 
             for (; !objListLin.NoFim(); objListLin.Seguinte())
@@ -194,6 +194,7 @@ namespace Picking.Lib_Primavera
                 var lindv = new OrderLine
                 {
                     IdCabecDoc = objListLin.Valor("idCabecDoc"),
+                    LineNo = objListLin.Valor("NumLinha"),
                     ItemId = objListLin.Valor("Artigo"),
                     ItemDescription = objListLin.Valor("Descricao"),
                     Quantity = objListLin.Valor("Quantidade"),
@@ -202,6 +203,8 @@ namespace Picking.Lib_Primavera
                     UnitPrice = objListLin.Valor("PrecUnit"),
                     TotalINet = objListLin.Valor("TotalILiquido"),
                     TotalNet = objListLin.Valor("PrecoLiquido"),
+                    Id = objListLin.Valor("Id"),
+                    Picked = objListLin.Valor("CDU_Picked") == 1
                 };
 
                 listlindv.Add(lindv);
@@ -209,6 +212,20 @@ namespace Picking.Lib_Primavera
 
             dv.OrderLines = listlindv;
             return dv;
+        }
+
+        public void MarkOrderLinePicked(Order order, OrderLine orderLine)
+        {
+            ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = 1 WHERE Id = '{0}'", orderLine.Id);
+
+            /*
+            var doc = _engine.Comercial.Vendas.EditaID(order.Id);
+            var fields = new StdBECampos();
+            fields.Insere(new StdBECampo { Nome = "CDU_Picked", Valor = 1 });
+            var line = doc.get_Linhas().get_Edita(orderLine.LineNo);
+            line.set_CamposUtil(fields);
+            _engine.Comercial.Vendas.Actualiza(doc);
+             * */
         }
 
         public int ExecuteQuery(string query, params object[] objs)
@@ -247,7 +264,7 @@ namespace Picking.Lib_Primavera
 
                 var listLinDv = new List<OrderLine>();
                 var objListLin = _engine.Consulta(
-                    "SELECT idCabecDoc, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasDoc where IdCabecDoc='" +
+                    "SELECT idCabecDoc, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Picked from LinhasDoc where IdCabecDoc='" +
                     dv.Id + "' order By NumLinha"
                     );
 
@@ -255,7 +272,9 @@ namespace Picking.Lib_Primavera
                 {
                     var linDv = new OrderLine
                     {
+                        Id = objListLin.Valor("Id"),
                         IdCabecDoc = objListLin.Valor("idCabecDoc"),
+                        LineNo = objListLin.Valor("NumLinha"),
                         ItemId = objListLin.Valor("Artigo"),
                         ItemDescription = objListLin.Valor("Descricao"),
                         Quantity = objListLin.Valor("Quantidade"),
@@ -263,7 +282,8 @@ namespace Picking.Lib_Primavera
                         Discount = objListLin.Valor("Desconto1"),
                         UnitPrice = objListLin.Valor("PrecUnit"),
                         TotalINet = objListLin.Valor("TotalILiquido"),
-                        TotalNet = objListLin.Valor("PrecoLiquido")
+                        TotalNet = objListLin.Valor("PrecoLiquido"),
+                        Picked = objListLin.Valor("CDU_Picked") == 1
                     };
 
                     listLinDv.Add(linDv);
@@ -322,6 +342,32 @@ namespace Picking.Lib_Primavera
             _engine.TerminaTransaccao();
 
             return true;
+        }
+
+        public void InsertPickingItems(IEnumerable<PickingItem> items)
+        {
+            var objListLin = _engine.Consulta(
+                "SELECT MAX(CDU_id) as id FROM TDU_PickingWave"
+            );
+
+            int maxId;
+            if (objListLin.NoFim())
+                maxId = 0;
+            else
+                maxId = (int) objListLin.Valor("id");
+
+            ExecuteQuery("INSERT INTO TDU_PickingWave (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
+                maxId + 1, DateTime.Now, "Zebino");
+
+            var i = 0;
+            foreach (var item in items)
+            {
+                ExecuteQuery(
+                    "INSERT INTO TDU_PickingItems (CDU_id, CDU_pickingWaveId, CDU_itemId, CDU_storageLocation, CDU_quantity," +
+                    "CDU_unit) VALUES ({0}, {1}, '{2}', '{3}', {4}, '{5}')", i, maxId + 1, item.ItemId, 
+                        item.StorageLocation, item.Quantity, item.Unit);
+                ++i;
+            }
         }
 
         private void EnsureInitialized()

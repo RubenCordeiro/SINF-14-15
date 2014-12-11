@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Picking.Lib_Primavera.Model
+﻿namespace Picking.Lib_Primavera.Model
 {
     public class OrderLine
     {
         public string ItemId { get; set; }
 
         public string ItemDescription { get; set; }
+
+        public int LineNo { get; set; }
 
         public string IdCabecDoc { get; set; }
 
@@ -24,5 +21,9 @@ namespace Picking.Lib_Primavera.Model
         public double TotalINet { get; set; }
 
         public double TotalNet { get; set; }
+
+        public bool Picked { get; set; }
+
+        public string Id { get; set; }
     }
 }

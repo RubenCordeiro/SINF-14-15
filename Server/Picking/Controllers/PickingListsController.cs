@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using Interop.GcpBE800;
 using Picking.Lib_Primavera;
@@ -69,15 +71,12 @@ namespace Picking.Controllers
             }
         }
 
-        public IEnumerable<PickingItem> Post(ICollection<int> orders)
+        public PickingWave Post(PickingSelection selection)
         {
-            if (orders.Count == 0)
-                return new List<PickingItem>();
-
-            var allStocks = _company.ListItemStock();
-
             var pickingItems = new List<PickingItem>();
-            foreach (var orderId in orders)
+            var skippedOrders = new List<OrderLine>();
+
+            foreach (var orderId in selection.Orders)
             {
                 Order order;
                 try
@@ -91,73 +90,143 @@ namespace Picking.Controllers
                     continue;
                 }
 
-                var removeOrderLines = new List<OrderLine>();
                 foreach (var orderLine in order.OrderLines)
                 {
-                    double totalStock = 0;
-                    foreach (var itemStock in allStocks)
+                    if (orderLine.Picked)
+                        continue;
+
+                    var stock = GetStock(orderLine.ItemId)
+                        .Where(itemStock => itemStock.Stock > 0 && itemStock.StorageFacility == selection.Facility)
+                        .OrderByDescending(itemStock => itemStock.Stock) // Prioritize by stock quantity
+                        .Where(itemStock => Location.FromString(itemStock.StorageLocation) != null) // Only valid locations
+                        .ToList();
+
+                    if (stock.Sum(itemStock => itemStock.Stock) < orderLine.Quantity)
                     {
-                        if (orderLine.ItemId == itemStock.Item)
+                        skippedOrders.Add(orderLine);
+                        continue;
+                    }
+
+                    ItemStock previousStockLocation = null;
+                    while (orderLine.Quantity > 0)
+                    {
+                        var stockLocation = previousStockLocation == null ? stock[0] : GetClosestStockLocation(stock, previousStockLocation);
+                        previousStockLocation = stockLocation;
+                        if (stockLocation == null)
+                            continue;
+
+                        double quantity;
+                        if (stockLocation.Stock > orderLine.Quantity)
                         {
-                            totalStock += itemStock.Stock;
-                            itemStock.Stock -= orderLine.Quantity;
+                            quantity = orderLine.Quantity;
+                            orderLine.Quantity = 0;
                         }
-                    }
-
-                    if (totalStock < orderLine.Quantity)
-                    {
-                        // Stock not enough to fullfil order
-                        removeOrderLines.Add(orderLine);
-                    }
-                }
-
-                foreach (var ol in removeOrderLines)
-                {
-                    order.OrderLines.Remove(ol);
-                }
-
-                foreach (var orderLine in order.OrderLines)
-                {
-                    foreach (var itemStock in allStocks)
-                    {
-                        if (orderLine.ItemId == itemStock.Item)
+                        else
                         {
-                            var orderLineQuantity = orderLine.Quantity;
-
-                            while (orderLineQuantity > 0)
-                            {
-                                double quantity;
-                                if (itemStock.Stock > orderLineQuantity)
-                                {
-                                    quantity = orderLineQuantity;
-                                    orderLineQuantity = 0;
-                                }
-                                else
-                                {
-                                    quantity = itemStock.Stock;
-                                    orderLineQuantity -= itemStock.Stock;
-                                }
-
-                                var pickingItem = new PickingItem
-                                {
-                                    ItemId = orderLine.ItemId,
-                                    ItemDescription = orderLine.ItemDescription,
-                                    Quantity = quantity,
-                                    Unit = orderLine.Unit,
-                                    StorageFacility = itemStock.StorageFacility,
-                                    StorageLocation = itemStock.StorageLocation,
-                                };
-
-                                pickingItems.Add(pickingItem);
-                            }
+                            quantity = stockLocation.Stock;
+                            orderLine.Quantity -= stockLocation.Stock;
                         }
+
+                        stockLocation.Stock -= quantity;
+
+                        if (Math.Abs(quantity) < Double.Epsilon)
+                            break;
+
+                        var pickingItem = new PickingItem
+                        {
+                            ItemId = orderLine.ItemId,
+                            ItemDescription = orderLine.ItemDescription,
+                            Quantity = quantity,
+                            Unit = orderLine.Unit,
+                            StorageFacility = stockLocation.StorageFacility,
+                            StorageLocation = stockLocation.StorageLocation,
+                        };
+
+                        pickingItems.Add(pickingItem);
+                        _company.MarkOrderLinePicked(order, orderLine);
                     }
                 }
-
-                // TODO: Add XPTO algorithm to select best pickingItems
             }
 
-            return pickingItems;
+            if (pickingItems.Count > 0)
+            {
+                _company.InsertPickingItems(pickingItems);
+                // TODO: if pickingItems is not empty:
+                // Mark orderlines as picked - DONE
+                // Save pickingItems in primavera's database - DONE
+                // Create transfer documents
+                // Update stocks
+            }
+
+            return new PickingWave {Items = pickingItems, SkippedOrders = skippedOrders};
+        }
+
+        private ItemStock GetClosestStockLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)
+        {
+            var d = double.PositiveInfinity;
+            ItemStock result = null;
+
+            var loc1 = Location.FromString(previousStockLocation.StorageLocation);
+
+            foreach (var s in stock)
+            {
+                var loc2 = Location.FromString(s.StorageLocation);
+                var dist = Location.GetDistance(loc1, loc2);
+
+                if (dist < d)
+                {
+                    result = s;
+                    d = dist;
+                }
+            }
+
+            return result;
+        }
+
+        private class Location
+        {
+            public static Location FromString(string location)
+            {
+                Contract.Requires(location != null);
+
+                var match = Regex.Match(location, "A([0-9]+)\\.C([0-9]+)\\.S([0-9]+)"); // A1.C1.S1
+                if (!match.Success)
+                    return null;
+
+                int a = int.Parse(match.Groups[1].ToString());
+                int c = int.Parse(match.Groups[2].ToString());
+                int s = int.Parse(match.Groups[3].ToString());
+
+                return new Location(a, c, s);
+            }
+
+            public Location(int a, int c, int s)
+            {
+                Facility = a;
+                Corridor = c;
+                Section = s;
+            }
+
+            public static double GetDistance(Location loc1, Location loc2)
+            {
+                Contract.Requires(loc1 != null);
+                Contract.Requires(loc2 != null);
+                Contract.Requires(loc1.Facility == loc2.Facility);
+
+                var v = Math.Abs(loc1.Corridor - loc2.Corridor);
+                var h = Math.Abs(loc1.Section - loc2.Section);
+
+                return v + h;
+            }
+
+            public int Facility { get; set; } // A
+            public int Corridor { get; set; } // C
+            public int Section { get; set; }  // S
+        }
+
+        private IEnumerable<ItemStock> GetStock(string itemId)
+        {
+            return _company.ListItemStock().Where(stock => stock.Item == itemId);
         }
 
         private readonly Company _company;

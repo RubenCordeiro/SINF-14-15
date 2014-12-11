@@ -51,21 +51,42 @@ angular.module('sinfApp.controllers', [])
         };
     })
 
-    .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService) {
+    .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService, $ionicLoading) {
 
-        $scope.orders = Restangular.all('orders').getList().$object;
+        $scope.orders = {};
         $scope.warehouses = {};
+        $scope.warehouse = {
+            name: ''
+        };
 
         $scope.init = function () {
+
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
             Restangular.all('storagefacilities').getList().then(function (data) {
                 $scope.warehouses = data;
                 if ($scope.warehouses.length > 0) {
-                    $scope.selectedWarehouse = $scope.warehouses[0];
+                    $scope.warehouse.name = $scope.warehouses[0];
                 }
-            })
+
+                $ionicLoading.hide();
+            });
+
+            Restangular.all('orders').getList().then(function (data) {
+                $scope.orders = data;
+
+
+                _.each($scope.orders, function(order) {
+                    var numProcessed = _.filter(order.OrderLines, function(orderline) {
+                        return orderline.Picked;
+                    }).length;
+
+                    order.Processed = Math.round(numProcessed / order.OrderLines.length, 2) * 100;
+                });
+            });
         };
-
-
 
         $scope.automaticChange = function (val) {
             for (var i = 0; i < $scope.orders.length; ++i) {
@@ -90,29 +111,42 @@ angular.module('sinfApp.controllers', [])
         };
 
         $scope.pickSelected = function() {
-
             var checkedOrders = _.filter($scope.orders, function (order) {
                 return order.checked;
             });
 
             var checkedOrdersIds = _.pluck(checkedOrders, 'NumDoc');
 
-            pickingListService.set(checkedOrdersIds);
+            pickingListService.set(checkedOrdersIds, $scope.warehouse.name);
             $state.go('app.pickingResult');
         };
     })
 
-    .controller('PickingResultCtrl', function ($scope, $stateParams, pickingListService, Restangular) {
+    .controller('PickingResultCtrl', function ($scope, $stateParams, pickingListService, Restangular, $ionicLoading, $ionicPopup) {
         $scope.title = /*$stateParams.pickingId*/ 'Picking List';
 
         $scope.items = {};
 
         $scope.init = function () {
-            Restangular.all('pickinglists').post(pickingListService.get()).then(function (data) {
-                $scope.items = data;
 
-                if ($scope.items.length > 0) {
-                    $scope.items[0].disabled = false;
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
+            Restangular.all('pickinglists').post(pickingListService.get()).then(function (data) {
+                $ionicLoading.hide();
+                if (data.Items.length > 0) {
+
+                    $scope.items = data.Items;
+
+                    for (var i = 0; i < $scope.items.length; ++i) {
+                        $scope.items[i].disabled = i != 0;
+                    }
+                } else {
+                    $ionicPopup.alert({
+                        title: 'Empty Picking Wave',
+                        template: '<p>Generated picking list is empty. This might happen because there is not enough stock in ' + pickingListService.get().Facility + '</p>'
+                    });
                 }
             });
         };
