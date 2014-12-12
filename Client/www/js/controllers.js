@@ -53,8 +53,8 @@ angular.module('sinfApp.controllers', [])
 
     .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService, $ionicLoading) {
 
-        $scope.orders = {};
-        $scope.warehouses = {};
+        $scope.orders = [];
+        $scope.warehouses = [];
         $scope.warehouse = {
             name: ''
         };
@@ -106,7 +106,7 @@ angular.module('sinfApp.controllers', [])
         $scope.showHelp = function() {
             $ionicPopup.alert({
                 title: 'Help Text',
-                template: '<p><strong>Automatic</strong> mode: orders are selected automatically<br><strong>Manual</strong> mode: select orders to putaway</p>'
+                template: '<p><strong>Automatic</strong> mode: orders are selected automatically<br><strong>Manual</strong> mode: select orders to pick</p>'
             });
         };
 
@@ -122,10 +122,11 @@ angular.module('sinfApp.controllers', [])
         };
     })
 
-    .controller('PickingResultCtrl', function ($scope, $stateParams, pickingListService, Restangular, $ionicLoading, $ionicPopup) {
+    .controller('PickingResultCtrl', function ($scope, $state, $stateParams, pickingListService, Restangular, $ionicLoading, $ionicPopup) {
         $scope.title = /*$stateParams.pickingId*/ 'Picking List';
 
-        $scope.items = {};
+        $scope.items = [];
+        $scope.skippedOrders = [];
 
         $scope.init = function () {
 
@@ -146,7 +147,13 @@ angular.module('sinfApp.controllers', [])
                     $ionicPopup.alert({
                         title: 'Empty Picking Wave',
                         template: '<p>Generated picking list is empty. This might happen because there is not enough stock in ' + pickingListService.get().Facility + '</p>'
+                    }).then(function () {
+                        $state.go('app.picking');
                     });
+                }
+
+                if (data.SkippedOrders.length > 0) {
+                    $scope.skippedOrders = data.SkippedOrders;
                 }
             });
         };

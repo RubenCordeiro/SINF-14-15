@@ -87,7 +87,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
     })
 
     .service('pickingListService', function () {
-        var orders = {};
+        var orders = [];
         var facility = '';
 
         this.set = function(o, f) {

@@ -154,8 +154,7 @@ namespace Picking.Controllers
                 // TODO: if pickingItems is not empty:
                 // Mark orderlines as picked - DONE
                 // Save pickingItems in primavera's database - DONE
-                // Create transfer documents
-                // Update stocks
+                // Create transfer documents & Update stocks
             }
 
             return new PickingWave {Items = pickingItems, SkippedOrders = skippedOrders};

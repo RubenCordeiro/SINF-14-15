@@ -15,8 +15,22 @@
                 </p>
             </ion-checkbox>
         </ion-list>
+        <p></p>
+        <ion-list ng-show="skippedOrders.length > 0">
+            <ion-toggle ng-model="showSkippedOrders" toggle-class="toggle-positive">Show Skipped Orders</ion-toggle>
+            <div class="item item-divider" ng-show="showSkippedOrders">
+                Skipped Orders (no stock)
+            </div>
+            <ion-item class="item" ng-repeat="order in skippedOrders" ng-show="showSkippedOrders">
+                <h2>{{order.ItemId}}</h2>
+                <h3>{{order.ItemDescription}}</h3>
+                <div class="item-note">
+                    {{order.Quantity}} {{order.Unit}}
+                </div>
+            </ion-item>
+        </ion-list>
     </ion-content>
     <div class="bar bar-clear bar-footer">
-        <a ng-disabled="!enableFinish" href="#/app/picking" class="button button-positive pull-right">Finished</a>
+        <a ng-disabled="!enableFinish" ui-sref="app.picking" nav-clear class="button button-positive pull-right">Finished</a>
     </div>
 </ion-view>
