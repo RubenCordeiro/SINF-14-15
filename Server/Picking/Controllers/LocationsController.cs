@@ -7,23 +7,18 @@ namespace Picking.Controllers
 {
     public class LocationsController : ApiController
     {
-        public LocationsController()
-        {
-            _company = new Company("BELAFLOR", "", "");
-        }
-
-        // GET: /api/locations/
+        // GET /api/locations/
         public IEnumerable<StorageLocation> Get()
         {
             return _company.ListStorageLocations();
         }
 
+        // GET /api/locations/<id>
         public StorageLocation Get(string id)
         {
-            var result = _company.GetStorageLocation(id);
-            return result;
+            return _company.GetStorageLocation(id);
         }
 
-        private readonly Company _company;
+        private readonly Company _company = new Company("BELAFLOR");
     }
 }

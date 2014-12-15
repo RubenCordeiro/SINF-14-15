@@ -9,28 +9,22 @@ namespace Picking.Controllers
 {
     public class OrdersController : ApiController
     {
-        public OrdersController()
-        {
-            _company = new Company("BELAFLOR", "", "");
-        }
-
-        // GET: /orders/
+        // GET /orders/
         public IEnumerable<Order> Get()
         {
             return _company.ListOrders();
         }
 
-        // GET: /orders/id
+        // GET /orders/<id>
         public Order Get(int id)
         {
             var docvenda = _company.GetOrder(id);
             if (docvenda == null)
-            {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            }
+
             return docvenda;
         }
 
-        private readonly Company _company;
+        private readonly Company _company = new Company("BELAFLOR");
     }
 }

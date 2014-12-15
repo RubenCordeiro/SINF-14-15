@@ -13,12 +13,7 @@ namespace Picking.Lib_Primavera
 {
     public class Company
     {
-        public Company(string name)
-        {
-            _name = name;
-        }
-
-        public Company(string name, string user, string password)
+        public Company(string name, string user = "", string password = "")
         {
             _name = name;
             if (!Initialize(user, password))
@@ -49,7 +44,7 @@ namespace Picking.Lib_Primavera
                 ref objStdTransac,
                 ref objAplConf,
                 ref objTipoPlataforma
-                );
+            );
 
             if (!_platform.Inicializada) return false;
 
@@ -63,7 +58,7 @@ namespace Picking.Lib_Primavera
                 ref objStdTransac,
                 "Default",
                 ref blnModoPrimario
-                );
+            );
 
             _connection = _platform.BaseDados.AbreBaseDadosADO("Default", "PRI" + _name);
 
@@ -395,30 +390,6 @@ namespace Picking.Lib_Primavera
             return result;
         }
 
-        public bool CreateStorageTransferDocument(Order order)
-        {
-            EnsureInitialized();
-
-            // _engine.Comercial.Stocks.
-            var doc = new GcpBEDocumentoStock();
-            doc.set_Tipodoc("TRA");
-            doc.set_ArmazemOrigem("A1"); // TODO: ArmazemOrigem comes from Order ? or from parameters
-
-            var lines = new GcpBELinhasDocumentoStock();
-            
-            foreach (var orderLine in order.OrderLines)
-            {
-                _engine.Comercial.Stocks.AdicionaLinha(doc, orderLine.ItemId, "", orderLine.Quantity, "A1",
-                    orderLine.UnitPrice, orderLine.Discount, "", "A1.S1.P3");
-            }
-
-            _engine.IniciaTransaccao();
-            _engine.Comercial.Stocks.Actualiza(doc);
-            _engine.TerminaTransaccao();
-
-            return true;
-        }
-
         public void InsertPickingItems(IEnumerable<PickingItem> items)
         {
             var objListLin = _engine.Consulta(
@@ -443,10 +414,11 @@ namespace Picking.Lib_Primavera
 
         private void EnsureInitialized()
         {
-            if (!_initialized) throw new Exception("Company not initialized!");
+            if (!_initialized)
+                throw new Exception("Company not initialized!");
         }
 
-        private bool _initialized = false;
+        private bool _initialized;
         private string _name;
         private readonly StdPlatBS _platform = new StdPlatBS();
         private readonly ErpBS _engine = new ErpBS();

@@ -9,18 +9,13 @@ namespace Picking.Controllers
 {
     public class ItemsController : ApiController
     {
-        public ItemsController()
-        {
-            _company = new Company("BELAFLOR", "", "");
-        }
-
-        // GET: /items/
+        // GET /items/
         public IEnumerable<Item> Get()
         {
             return _company.ListItems();
         }
 
-        // GET: api/items/5
+        // GET api/items/<id>
         public Item Get(string id)
         {
             var artigo = _company.GetItem(id);
@@ -31,6 +26,6 @@ namespace Picking.Controllers
             return artigo;
         }
 
-        private readonly Company _company;
+        private readonly Company _company = new Company("BELAFLOR");
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -11,11 +10,7 @@ namespace Picking.Controllers
 {
     public class StocksController : ApiController
     {
-        StocksController()
-        {
-            _company = new Company("BELAFLOR", "", "");
-        }
-
+        // GET /api/stocks
         public IEnumerable<ItemStock> Get()
         {
             try
@@ -28,6 +23,6 @@ namespace Picking.Controllers
             }
         }
 
-        private readonly Company _company;
+        private readonly Company _company = new Company("BELAFLOR");
     }
 }

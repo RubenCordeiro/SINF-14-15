@@ -5,6 +5,7 @@ namespace Picking.Controllers
 {
     public class DebugController : ApiController
     {
+        // GET /api/debug/<action>
         public string Get(string action)
         {
             switch (action)
@@ -22,6 +23,6 @@ namespace Picking.Controllers
             }
         }
 
-        private readonly Company _company = new Company("BELAFLOR", "", "");
+        private readonly Company _company = new Company("BELAFLOR");
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Http;
 using Picking.Lib_Primavera;
 using Picking.Lib_Primavera.Model;
@@ -10,6 +8,7 @@ namespace Picking.Controllers
 {
     public class PickingWaveController : ApiController
     {
+        // POST /api/pickingwave/
         public IEnumerable<string> Post(PickingWave pickingWave)
         {
             var errors = new List<string>();
@@ -42,6 +41,6 @@ namespace Picking.Controllers
             return errors;
         }
 
-        private readonly Company _company = new Company("BELAFLOR", "", "");
+        private readonly Company _company = new Company("BELAFLOR");
     }
 }

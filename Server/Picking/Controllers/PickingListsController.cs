@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Web.Http;
-using Interop.GcpBE800;
 using Picking.Lib_Primavera;
 using Picking.Lib_Primavera.Model;
 
@@ -15,57 +11,7 @@ namespace Picking.Controllers
 {
     public class PickingListsController : ApiController
     {
-        public string Get()
-        {
-            
-            try
-            {
-                var data = DateTime.Now;
-
-                var doc = new GcpBEDocumentoStock();
-
-                doc.set_Tipodoc("TRA");
-
-                _company.Engine.Comercial.Stocks.PreencheDadosRelacionados(doc);
-                
-                doc.set_ArmazemOrigem("A1"); // TODO: ArmazemOrigem comes from Order ? or from parameters
-                doc.set_DataDoc(DateTime.Now);
-
-                var lines = new GcpBELinhasDocumentoStock();
-
-                var itemLines = _company.Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: "FC.0002", Armazem: "A1", Quantidade: 10D, Localizacao: "A1.S2.P1");
-
-                // _company.Engine.Comercial.Stocks.AdicionaLinha(ClsDocStk: doc, Artigo: "FC.0002", Armazem: "A1", Quantidade: 10D, Localizacao: "A1.S2.P1");
-
-
-                for (var i = 1; i <= itemLines.NumItens; ++i)
-                {
-                    var line = itemLines.get_Edita(i);
-                    line.set_LocalizacaoOrigem("A1.S1.P3");
-                    line.set_DataStock(data);
-
-                    lines.Insere(line);
-                }
-
-                doc.set_Linhas(lines);
-
-                var avisos = "";
-
-                _company.Engine.Comercial.Stocks.Actualiza(doc, ref avisos);
-
-                return avisos;
-
-            }
-            catch (COMException ex)
-            {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, "COMException: " + ex));
-            }
-            catch (Exception ex)
-            {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, "Exception: " + ex));
-            }
-        }
-
+        // POST /api/pickinglist/
         public PickingWave Post(PickingSelection selection)
         {
             var pickingItems = new List<PickingItem>();
@@ -149,7 +95,7 @@ namespace Picking.Controllers
             return new PickingWave {Items = pickingItems, SkippedOrders = skippedOrders};
         }
 
-        private ItemStock GetClosestStockLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)
+        private static ItemStock GetClosestStockLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)
         {
             var d = double.PositiveInfinity;
             ItemStock result = null;
@@ -217,6 +163,6 @@ namespace Picking.Controllers
             return _company.ListItemStock().Where(stock => stock.Item == itemId);
         }
 
-        private readonly Company _company = new Company("BELAFLOR", "", "");
+        private readonly Company _company = new Company("BELAFLOR");
     }
 }
