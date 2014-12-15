@@ -8,6 +8,7 @@ using Interop.GcpBE800;
 using Interop.StdBE800;
 using Interop.StdPlatBS800;
 using Picking.Lib_Primavera.Model;
+
 // ReSharper disable UseIndexedProperty
 
 namespace Picking.Lib_Primavera
@@ -71,6 +72,75 @@ namespace Picking.Lib_Primavera
             _initialized = true;
 
             return true;
+        }
+
+        public string GenerateStockRemovalDocument(PickingItem item, double quantity)
+        {
+            var data = DateTime.Now;
+            var doc = new GcpBEDocumentoStock();
+
+            doc.set_Tipodoc("SS");
+
+            Engine.Comercial.Stocks.PreencheDadosRelacionados(doc);
+
+            doc.set_ArmazemOrigem(item.StorageFacility);
+            doc.set_DataDoc(data);
+
+            var lines = new GcpBELinhasDocumentoStock();
+
+            var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.ItemId, Armazem: item.StorageFacility, Localizacao: item.StorageLocation, Quantidade: quantity, EntradaSaida: "S", TipoDocStock: "SS");
+            for (var i = 1; i <= itemLines.NumItens; ++i)
+            {
+                var line = itemLines.get_Edita(i);
+                line.set_LocalizacaoOrigem(item.StorageLocation);
+                line.set_DataStock(data);
+
+                lines.Insere(line);
+            }
+
+            doc.set_Linhas(lines);
+
+            var avisos = string.Empty;
+            Engine.Comercial.Stocks.Actualiza(doc, ref avisos);
+
+            return avisos;
+        }
+
+        public string GenerateStockTransferDocument(IEnumerable<PickingItem> items, string facility)
+        {
+            var data = DateTime.Now;
+            var doc = new GcpBEDocumentoStock();
+
+            doc.set_Tipodoc("TRA");
+
+            Engine.Comercial.Stocks.PreencheDadosRelacionados(doc);
+
+            doc.set_ArmazemOrigem(facility);
+            doc.set_DataDoc(data);
+
+            var facilityOut = facility + ".OUT";
+
+            var lines = new GcpBELinhasDocumentoStock();
+
+            foreach (var item in items)
+            {
+                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.ItemId, Armazem: facilityOut, Localizacao: item.StorageLocation, Quantidade: item.PickedQuantity, TipoDocStock: "TRA");
+                for (var i = 1; i <= itemLines.NumItens; ++i)
+                {
+                    var line = itemLines.get_Edita(i);
+                    line.set_LocalizacaoOrigem(item.StorageLocation);
+                    line.set_DataStock(data);
+
+                    lines.Insere(line);
+                }
+            }
+
+            doc.set_Linhas(lines);
+
+            var avisos = string.Empty;
+            Engine.Comercial.Stocks.Actualiza(doc, ref avisos);
+
+            return avisos;
         }
 
         public Item GetItem(string id)
