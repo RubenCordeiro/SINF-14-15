@@ -13,6 +13,10 @@ namespace Picking.Controllers
                     return _company.ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = 0").ToString();
                 case "set_picked":
                     return _company.ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = 1").ToString();
+                case "reset_pickedq":
+                    return _company.ExecuteQuery("UPDATE LinhasDoc SET CDU_PickedQuantity = 0").ToString();
+                case "set_pickedq":
+                    return _company.ExecuteQuery("UPDATE LinhasDoc SET CDU_PickedQuantity = Quantidade").ToString();
                 default:
                     return "Action " + action + " not handled.";
             }

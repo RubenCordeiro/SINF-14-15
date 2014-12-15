@@ -24,6 +24,8 @@
 
         public bool Picked { get; set; }
 
+        public double PickedQuantity { get; set; }
+
         public string Id { get; set; }
     }
 }

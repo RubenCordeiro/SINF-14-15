@@ -34,21 +34,19 @@ angular.module('sinfApp.controllers', [])
     })
 
     .controller('HomeCtrl', function ($scope, Restangular, $ionicPopup) {
-        $scope.setPicked0 = function () {
-            Restangular.one('debug').get({ action: 'reset_picked' }).then(function (data) {
-                $ionicPopup.alert({
-                    template: JSON.stringify(data)
-                });
-            });
-        };
 
-        $scope.setPicked1 = function () {
-            Restangular.one('debug').get({ action: 'set_picked' }).then(function (data) {
+        function execute(action) {
+            Restangular.one('debug').get({ action: action }).then(function (data) {
                 $ionicPopup.alert({
                     template: JSON.stringify(data)
                 });
             });
-        };
+        }
+
+        $scope.setPicked0 =  function() { execute('reset_picked'); }
+        $scope.setPicked1 =  function() { execute('set_picked'); }
+        $scope.setPickedq0 = function() { execute('reset_pickedq'); }
+        $scope.setPickedq1 = function() { execute('set_pickedq'); }
     })
 
     .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService, $ionicLoading) {
@@ -71,6 +69,8 @@ angular.module('sinfApp.controllers', [])
                     $scope.warehouse.name = $scope.warehouses[0];
                 }
 
+                $ionicLoading.hide();
+            }, function () {
                 $ionicLoading.hide();
             });
 
@@ -142,6 +142,7 @@ angular.module('sinfApp.controllers', [])
 
                     for (var i = 0; i < $scope.items.length; ++i) {
                         $scope.items[i].disabled = i != 0;
+                        $scope.items[i].PickedQuantity = $scope.items[i].Quantity;
                     }
                 } else {
                     $ionicPopup.alert({
@@ -158,22 +159,22 @@ angular.module('sinfApp.controllers', [])
             });
         };
 
-        $scope.enableFinish = false;
+        $scope.enableFinish = true;
 
-        $scope.itemChecked = function (id ) {
-            $scope.items[id].disabled = true;
+        $scope.finished = function () {
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
 
-            if (id + 1 < $scope.items.length) {
-                $scope.items[id + 1].disabled = false;
-            }
-
-            $scope.enableFinish = true;
-            for (var i = 0; i < $scope.items.length; ++i) {
-                if (!$scope.items[i].checked) {
-                    $scope.enableFinish = false;
-                    break;
-                }
-            }
+            Restangular.all('pickingwave').post($scope.items).then(function () {
+                $ionicLoading.hide();
+                $state.go('app.picking');
+            }, function (err) {
+                $ionicPopup.alert({
+                    title: 'Help Text',
+                    template: '<p>Error occurred: ' + JSON.stringify(err) + '</p>'
+                });
+            });
         };
     })
 

@@ -261,6 +261,7 @@
     <Compile Include="Controllers\LocationsController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PickingListsController.cs" />
+    <Compile Include="Controllers\PickingWaveController.cs" />
     <Compile Include="Controllers\StocksController.cs" />
     <Compile Include="Controllers\StorageFacilitiesController.cs" />
     <Compile Include="Global.asax.cs">

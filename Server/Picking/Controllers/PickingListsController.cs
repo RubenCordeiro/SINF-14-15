@@ -15,11 +15,6 @@ namespace Picking.Controllers
 {
     public class PickingListsController : ApiController
     {
-        public PickingListsController()
-        {
-            _company = new Company("BELAFLOR", "", "");
-        }
-
         public string Get()
         {
             
@@ -95,6 +90,9 @@ namespace Picking.Controllers
                     if (orderLine.Picked)
                         continue;
 
+                    if (Math.Abs(orderLine.PickedQuantity - orderLine.Quantity) < Double.Epsilon * 100)
+                        continue;
+
                     var stock = GetStock(orderLine.ItemId)
                         .Where(itemStock => itemStock.Stock > 0 && itemStock.StorageFacility == selection.Facility)
                         .OrderByDescending(itemStock => itemStock.Stock) // Prioritize by stock quantity
@@ -143,18 +141,9 @@ namespace Picking.Controllers
                         };
 
                         pickingItems.Add(pickingItem);
-                        _company.MarkOrderLinePicked(order, orderLine);
+                        _company.MarkOrderLinePicked(orderLine);
                     }
                 }
-            }
-
-            if (pickingItems.Count > 0)
-            {
-                _company.InsertPickingItems(pickingItems);
-                // TODO: if pickingItems is not empty:
-                // Mark orderlines as picked - DONE
-                // Save pickingItems in primavera's database - DONE
-                // Create transfer documents & Update stocks
             }
 
             return new PickingWave {Items = pickingItems, SkippedOrders = skippedOrders};
@@ -228,6 +217,6 @@ namespace Picking.Controllers
             return _company.ListItemStock().Where(stock => stock.Item == itemId);
         }
 
-        private readonly Company _company;
+        private readonly Company _company = new Company("BELAFLOR", "", "");
     }
 }
