@@ -41,6 +41,6 @@ namespace Picking.Controllers
             return errors;
         }
 
-        private readonly Company _company = new Company("BELAFLOR");
+        private readonly Company _company = new Company(Company.COMPANY);
     }
 }

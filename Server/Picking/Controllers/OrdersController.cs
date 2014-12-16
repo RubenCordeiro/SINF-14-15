@@ -25,6 +25,6 @@ namespace Picking.Controllers
             return docvenda;
         }
 
-        private readonly Company _company = new Company("BELAFLOR");
+        private readonly Company _company = new Company(Company.COMPANY);
     }
 }

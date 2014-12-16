@@ -12,6 +12,6 @@ namespace Picking.Controllers
             return _company.ListStorageFacilities();
         }
 
-        private readonly Company _company = new Company("BELAFLOR", "", "");
+        private readonly Company _company = new Company(Company.COMPANY);
     }
 }

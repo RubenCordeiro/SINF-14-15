@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using ADODB;
 using Interop.ErpBS800;
 using Interop.GcpBE800;
@@ -14,6 +13,8 @@ namespace Picking.Lib_Primavera
 {
     public class Company
     {
+        public static string COMPANY = "PRIMADELL";
+
         public Company(string name, string user = "", string password = "")
         {
             _name = name;

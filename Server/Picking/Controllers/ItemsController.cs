@@ -26,6 +26,6 @@ namespace Picking.Controllers
             return artigo;
         }
 
-        private readonly Company _company = new Company("BELAFLOR");
+        private readonly Company _company = new Company(Company.COMPANY);
     }
 }

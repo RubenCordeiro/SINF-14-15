@@ -164,6 +164,6 @@ namespace Picking.Controllers
             return _company.ListItemStock().Where(stock => stock.Item == itemId);
         }
 
-        private readonly Company _company = new Company("BELAFLOR");
+        private readonly Company _company = new Company(Company.COMPANY);
     }
 }
