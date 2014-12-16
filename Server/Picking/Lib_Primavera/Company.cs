@@ -395,19 +395,19 @@ namespace Picking.Lib_Primavera
         public void InsertPickingItems(IEnumerable<PickingItem> items)
         {
             var objListLin = _engine.Consulta(
-                "SELECT ISNULL(MAX(CDU_id), 0) as id FROM TDU_PickingWave"
+                "SELECT ISNULL(MAX(CDU_id), 0) as id FROM TDU_PickingList"
             );
 
             var maxId = (int) objListLin.Valor("id");
 
-            ExecuteQuery("INSERT INTO TDU_PickingWave (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
+            ExecuteQuery("INSERT INTO TDU_PickingList (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
                 maxId + 1, DateTime.Now.ToString("yyyy-mm-dd hh:MM:ss.000"), "Zebino");
 
             var i = 0;
             foreach (var item in items)
             {
                 ExecuteQuery(
-                    "INSERT INTO TDU_PickingItems (CDU_id, CDU_pickingWaveId, CDU_itemId, CDU_storageLocation, CDU_quantity," +
+                    "INSERT INTO TDU_PickingItems (CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity," +
                     "CDU_unit) VALUES ({0}, {1}, '{2}', '{3}', {4}, '{5}')", i, maxId + 1, item.ItemId, 
                         item.StorageLocation, item.PickedQuantity, item.Unit);
                 ++i;

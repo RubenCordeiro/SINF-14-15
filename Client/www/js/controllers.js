@@ -146,7 +146,7 @@ angular.module('sinfApp.controllers', [])
                     }
                 } else {
                     $ionicPopup.alert({
-                        title: 'Empty Picking Wave',
+                        title: 'Empty Picking List',
                         template: '<p>Generated picking list is empty. This might happen because there is not enough stock in ' + pickingListService.get().Facility + '</p>'
                     }).then(function () {
                         $state.go('app.picking');
@@ -184,7 +184,7 @@ angular.module('sinfApp.controllers', [])
                 $scope.items[i].PickedQuantity = parseFloat($scope.items[i].PickedQuantity);
             }
 
-            Restangular.all('pickingwave').post({ Items: $scope.items, SkippedOrders: $scope.skippedOrders}).then(function () {
+            Restangular.all('pickinglists').put({ Items: $scope.items, SkippedOrders: $scope.skippedOrders}).then(function () {
                 $ionicLoading.hide();
                 $state.go('app.picking');
             }, function (err) {
