@@ -6,10 +6,11 @@
         <ul class="list">
             <li class="item" ng-repeat="item in items" ng-disabled="item.disabled">
                 <h2>{{item.ItemId}}</h2>
-                <div class="item-note">
-                    <label class="item-input">
-                        <span class="input-label">{{item.Unit}}</span>
-                        <input style="padding-top: 0; width: 40px" ng-model="item.PickedQuantity" value="{{item.Quantity}}" type="number" min="0" max="{{item.Quantity}}" step="0.01" ng-focus>
+                <div class="item-note item-input">
+                    <label>
+                        <input style="display: inline; width: 100px" ng-model="item.PickedQuantity" type="text" min="0"
+                               max="{{item.Quantity}}" step="0.1" ng-blur="inputPickedQuantityBlur(item)"
+                               ng-focus="inputPickedQuantityFocus(item)">
                     </label>
                 </div>
                 <p>

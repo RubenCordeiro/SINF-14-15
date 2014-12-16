@@ -2,7 +2,7 @@
 
 namespace Picking.Lib_Primavera.Model
 {
-    public class PickingWave
+    public class PickingList
     {
         public IEnumerable<PickingItem> Items { get; set; }
 

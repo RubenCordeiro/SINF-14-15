@@ -9,17 +9,15 @@ namespace Picking.Controllers
     public class PickingWaveController : ApiController
     {
         // POST /api/pickingwave/
-        public IEnumerable<string> Post(PickingWave pickingWave)
+        public IEnumerable<string> Post(PickingList pickingList)
         {
             var errors = new List<string>();
-            var itemsList = pickingWave.Items.ToList();
+            var itemsList = pickingList.Items.ToList();
             if (itemsList.Count == 0)
             {
                 errors.Add("Empty input.");
                 return errors;
             }
-
-            var facility = itemsList[0].StorageFacility;
 
             foreach (var item in itemsList)
             {
@@ -29,12 +27,14 @@ namespace Picking.Controllers
                     var err1 = _company.GenerateStockRemovalDocument(item, quantity);
                     if (!string.IsNullOrWhiteSpace(err1))
                         errors.Add(err1);
+
+                    _company.MarkOrderLinePicked(item.OrderLineId, false);
                 }
             }
 
             _company.InsertPickingItems(itemsList);
 
-            var err2 = _company.GenerateStockTransferDocument(itemsList, facility);
+            var err2 = _company.GenerateStockTransferDocument(itemsList);
             if (!string.IsNullOrWhiteSpace(err2))
                 errors.Add(err2);
 

@@ -135,7 +135,7 @@
     <Compile Include="Lib_Primavera\Model\OrderLine.cs" />
     <Compile Include="Lib_Primavera\Model\PickingItem.cs" />
     <Compile Include="Lib_Primavera\Model\PickingSelection.cs" />
-    <Compile Include="Lib_Primavera\Model\PickingWave.cs" />
+    <Compile Include="Lib_Primavera\Model\PickingList.cs" />
     <Compile Include="Lib_Primavera\Model\StorageLocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

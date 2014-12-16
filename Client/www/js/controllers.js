@@ -142,7 +142,7 @@ angular.module('sinfApp.controllers', [])
 
                     for (var i = 0; i < $scope.items.length; ++i) {
                         $scope.items[i].disabled = i != 0;
-                        $scope.items[i].PickedQuantity = $scope.items[i].Quantity;
+                        $scope.items[i].PickedQuantity = $scope.items[i].Quantity + " " + $scope.items[i].Unit;
                     }
                 } else {
                     $ionicPopup.alert({
@@ -156,7 +156,21 @@ angular.module('sinfApp.controllers', [])
                 if (data.SkippedOrders.length > 0) {
                     $scope.skippedOrders = data.SkippedOrders;
                 }
-            });
+             });
+        };
+
+        var clamp = function(num, min, max) {
+            return num < min ? min : (num > max ? max : num);
+        };
+
+        $scope.inputPickedQuantityBlur = function (item) {
+            item.PickedQuantity = clamp(parseFloat(item.PickedQuantity), 0, item.Quantity) + " " + item.Unit;
+            if (isNaN(parseFloat(item.PickedQuantity)))
+                item.PickedQuantity = 0 + " " + item.Unit;
+        };
+
+        $scope.inputPickedQuantityFocus = function (item) {
+            item.PickedQuantity = parseFloat(item.PickedQuantity);
         };
 
         $scope.enableFinish = true;
@@ -166,7 +180,11 @@ angular.module('sinfApp.controllers', [])
                 template: 'Loading...'
             });
 
-            Restangular.all('pickingwave').post($scope.items).then(function () {
+            for (var i = 0; i < $scope.items.length; ++i) {
+                $scope.items[i].PickedQuantity = parseFloat($scope.items[i].PickedQuantity);
+            }
+
+            Restangular.all('pickingwave').post({ Items: $scope.items, SkippedOrders: $scope.skippedOrders}).then(function () {
                 $ionicLoading.hide();
                 $state.go('app.picking');
             }, function (err) {

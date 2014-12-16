@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using ADODB;
 using Interop.ErpBS800;
 using Interop.GcpBE800;
@@ -99,7 +100,7 @@ namespace Picking.Lib_Primavera
             return avisos;
         }
 
-        public string GenerateStockTransferDocument(IEnumerable<PickingItem> items, string facility)
+        public string GenerateStockTransferDocument(IList<PickingItem> items)
         {
             var data = DateTime.Now;
             var doc = new GcpBEDocumentoStock();
@@ -108,22 +109,22 @@ namespace Picking.Lib_Primavera
 
             Engine.Comercial.Stocks.PreencheDadosRelacionados(doc);
 
+            var facility = items[0].StorageFacility;
+            var facilityOut = facility + ".OUT";
+
             doc.set_ArmazemOrigem(facility);
             doc.set_DataDoc(data);
-
-            var facilityOut = facility + ".OUT";
 
             var lines = new GcpBELinhasDocumentoStock();
 
             foreach (var item in items)
             {
-                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.ItemId, Armazem: facilityOut, Localizacao: item.StorageLocation, Quantidade: item.PickedQuantity, TipoDocStock: "TRA");
+                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.ItemId, Armazem: facility, Localizacao: facilityOut, Quantidade: item.PickedQuantity, TipoDocStock: "TRA");
                 for (var i = 1; i <= itemLines.NumItens; ++i)
                 {
                     var line = itemLines.get_Edita(i);
                     line.set_LocalizacaoOrigem(item.StorageLocation);
                     line.set_DataStock(data);
-
                     lines.Insere(line);
                 }
             }
@@ -278,9 +279,9 @@ namespace Picking.Lib_Primavera
             return dv;
         }
 
-        public void MarkOrderLinePicked(OrderLine orderLine, bool picked = true)
+        public void MarkOrderLinePicked(string orderLineId, bool picked = true)
         {
-            ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = {0} WHERE Id = '{1}'", picked ? 1 : 0, orderLine.Id);
+            ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = {0} WHERE Id = '{1}'", picked ? 1 : 0, orderLineId);
 
             /* old, slow
             var doc = _engine.Comercial.Vendas.EditaID(order.Id);
@@ -399,7 +400,7 @@ namespace Picking.Lib_Primavera
             var maxId = (int) objListLin.Valor("id");
 
             ExecuteQuery("INSERT INTO TDU_PickingWave (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
-                maxId + 1, DateTime.Now, "Zebino");
+                maxId + 1, DateTime.Now.ToString("yyyy-mm-dd hh:MM:ss.000"), "Zebino");
 
             var i = 0;
             foreach (var item in items)

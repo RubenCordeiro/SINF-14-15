@@ -12,7 +12,7 @@ namespace Picking.Controllers
     public class PickingListsController : ApiController
     {
         // POST /api/pickinglist/
-        public PickingWave Post(PickingSelection selection)
+        public PickingList Post(PickingSelection selection)
         {
             var pickingItems = new List<PickingItem>();
             var skippedOrders = new List<OrderLine>();
@@ -78,6 +78,7 @@ namespace Picking.Controllers
 
                         var pickingItem = new PickingItem
                         {
+                            OrderLineId = orderLine.Id,
                             ItemId = orderLine.ItemId,
                             ItemDescription = orderLine.ItemDescription,
                             Quantity = quantity,
@@ -87,12 +88,12 @@ namespace Picking.Controllers
                         };
 
                         pickingItems.Add(pickingItem);
-                        _company.MarkOrderLinePicked(orderLine);
+                        _company.MarkOrderLinePicked(orderLine.Id);
                     }
                 }
             }
 
-            return new PickingWave {Items = pickingItems, SkippedOrders = skippedOrders};
+            return new PickingList {Items = pickingItems, SkippedOrders = skippedOrders};
         }
 
         private static ItemStock GetClosestStockLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)
