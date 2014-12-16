@@ -311,6 +311,117 @@ namespace Picking.Lib_Primavera
             return (int) count;
         }
 
+        public List<Supply> ListSupplies()
+        {
+            EnsureInitialized();
+
+            var objListCab =
+                _engine.Consulta("SELECT Id, Entidade, Fornecedores.Nome as EntidadeNome, DataDoc, NumDoc, TotalMerc, Serie FROM CabecCompras INNER JOIN Fornecedores ON Fornecedores.Fornecedor = CabecCompras.Entidade where TipoDoc='ECF'");
+
+            var listDv = new List<Supply>();
+
+            for (; !objListCab.NoFim(); objListCab.Seguinte())
+            {
+                var dv = new Supply
+                {
+                    Id = objListCab.Valor("Id"),
+                    Entity = objListCab.Valor("Entidade"),
+                    EntityName = objListCab.Valor("EntidadeNome"),
+                    Data = objListCab.Valor("DataDoc"),
+                    NumDoc = objListCab.Valor("NumDoc"),
+                    TotalMerc = objListCab.Valor("TotalMerc"),
+                    Serie = objListCab.Valor("Serie")
+                };
+
+                var listLinDv = new List<SupplyLine>();
+                var objListLin = _engine.Consulta(
+                    "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasCompras where IdCabecCompras='" +
+                    dv.Id + "' order By NumLinha"
+                );
+
+                for (; !objListLin.NoFim(); objListLin.Seguinte())
+                {
+                    var linDv = new SupplyLine
+                    {
+                        IdCabecCompras = objListLin.Valor("IdCabecCompras"),
+                        Id = objListLin.Valor("Id"),
+                        LineNo = objListLin.Valor("NumLinha"),
+                        ItemId = objListLin.Valor("Artigo"),
+                        ItemDescription = objListLin.Valor("Descricao"),
+                        Quantity = objListLin.Valor("Quantidade"),
+                        Unit = objListLin.Valor("Unidade"),
+                        Discount = objListLin.Valor("Desconto1"),
+                        UnitPrice = objListLin.Valor("PrecUnit"),
+                        TotalINet = objListLin.Valor("TotalIliquido"),
+                        TotalNet = objListLin.Valor("PrecoLiquido")
+                        // Putaway = objListLin.Valor("CDU_Putaway") == 1,
+                        // PutawayQuantity = objListLin.Valor("CDU_PutawayQuantity")
+                    };
+
+                    listLinDv.Add(linDv);
+                }
+
+                dv.SupplyLines = listLinDv;
+                listDv.Add(dv);
+            }
+
+            return listDv;
+        }
+
+        public Supply GetSupply(int numDoc)
+        {
+            EnsureInitialized();
+
+            var objListCab =
+                _engine.Consulta("SELECT Id, Entidade, Fornecedores.Nome as EntidadeNome, DataDoc, NumDoc, TotalMerc, Serie FROM CabecCompras INNER JOIN Fornecedores ON Fornecedores.Fornecedor = CabecCompras.Entidade where TipoDoc='ECF' AND NumDoc='" + numDoc + "'");
+
+            if (objListCab.Vazia())
+                return null;
+
+            var dv = new Supply
+            {
+                Id = objListCab.Valor("Id"),
+                Entity = objListCab.Valor("Entidade"),
+                EntityName = objListCab.Valor("EntidadeNome"),
+                Data = objListCab.Valor("DataDoc"),
+                NumDoc = objListCab.Valor("NumDoc"),
+                TotalMerc = objListCab.Valor("TotalMerc"),
+                Serie = objListCab.Valor("Serie")
+            };
+
+            var listLinDv = new List<SupplyLine>();
+            var objListLin = _engine.Consulta(
+                "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasCompras where IdCabecCompras='" +
+                dv.Id + "' order By NumLinha"
+            );
+
+            for (; !objListLin.NoFim(); objListLin.Seguinte())
+            {
+                var linDv = new SupplyLine
+                {
+                    IdCabecCompras = objListLin.Valor("IdCabecCompras"),
+                    Id = objListLin.Valor("Id"),
+                    LineNo = objListLin.Valor("NumLinha"),
+                    ItemId = objListLin.Valor("Artigo"),
+                    ItemDescription = objListLin.Valor("Descricao"),
+                    Quantity = objListLin.Valor("Quantidade"),
+                    Unit = objListLin.Valor("Unidade"),
+                    Discount = objListLin.Valor("Desconto1"),
+                    UnitPrice = objListLin.Valor("PrecUnit"),
+                    TotalINet = objListLin.Valor("TotalIliquido"),
+                    TotalNet = objListLin.Valor("PrecoLiquido")
+                    // Putaway = objListLin.Valor("CDU_Putaway") == 1,
+                    // PutawayQuantity = objListLin.Valor("CDU_PutawayQuantity")
+                };
+
+                listLinDv.Add(linDv);
+            }
+
+            dv.SupplyLines = listLinDv;
+
+            return dv;
+        }
+
         public List<Order> ListOrders()
         {
             EnsureInitialized();
@@ -337,7 +448,7 @@ namespace Picking.Lib_Primavera
                 var objListLin = _engine.Consulta(
                     "SELECT idCabecDoc, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Picked, CDU_PickedQuantity from LinhasDoc where IdCabecDoc='" +
                     dv.Id + "' order By NumLinha"
-                    );
+                );
 
                 for (; !objListLin.NoFim(); objListLin.Seguinte())
                 {

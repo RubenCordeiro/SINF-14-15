@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 
 namespace Picking.Lib_Primavera.Model
 {
-    public class Order
+    public class Supply
     {
         public string Id { get; set; }
 
@@ -19,10 +21,10 @@ namespace Picking.Lib_Primavera.Model
 
         public string Serie { get; set; }
 
-        public List<OrderLine> OrderLines { get; set; }
+        public List<SupplyLine> SupplyLines { get; set; }
     }
 
-    public class OrderLine
+    public class SupplyLine
     {
         public string ItemId { get; set; }
 
@@ -30,7 +32,7 @@ namespace Picking.Lib_Primavera.Model
 
         public int LineNo { get; set; }
 
-        public string IdCabecDoc { get; set; }
+        public string IdCabecCompras { get; set; }
 
         public double Quantity { get; set; }
 
@@ -44,9 +46,9 @@ namespace Picking.Lib_Primavera.Model
 
         public double TotalNet { get; set; }
 
-        public bool Picked { get; set; }
+        public bool Putaway { get; set; }
 
-        public double PickedQuantity { get; set; }
+        public double PutawayQuantity { get; set; }
 
         public string Id { get; set; }
     }

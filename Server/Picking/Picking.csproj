@@ -124,6 +124,7 @@
     <Compile Include="Controllers\PickingListsController.cs" />
     <Compile Include="Controllers\StocksController.cs" />
     <Compile Include="Controllers\StorageFacilitiesController.cs" />
+    <Compile Include="Controllers\SuppliesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -131,11 +132,11 @@
     <Compile Include="Lib_Primavera\Model\Item.cs" />
     <Compile Include="Lib_Primavera\Model\ItemStock.cs" />
     <Compile Include="Lib_Primavera\Model\Order.cs" />
-    <Compile Include="Lib_Primavera\Model\OrderLine.cs" />
     <Compile Include="Lib_Primavera\Model\PickingItem.cs" />
     <Compile Include="Lib_Primavera\Model\PickingSelection.cs" />
     <Compile Include="Lib_Primavera\Model\PickingList.cs" />
     <Compile Include="Lib_Primavera\Model\StorageLocation.cs" />
+    <Compile Include="Lib_Primavera\Model\Supply.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
