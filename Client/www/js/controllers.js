@@ -44,12 +44,14 @@ angular.module('sinfApp.controllers', [])
             });
         }
 
-        $scope.setPicked0 =  function() { execute('reset_picked'); }
-        $scope.setPicked1 =  function() { execute('set_picked'); }
-        $scope.setPickedq0 = function() { execute('reset_pickedq'); }
-        $scope.setPickedq1 = function() { execute('set_pickedq'); }
+        $scope.setPicked0 =  function() { execute('reset_picked'); };
+        $scope.setPicked1 =  function() { execute('set_picked'); };
+        $scope.setPickedq0 = function() { execute('reset_pickedq'); };
+        $scope.setPickedq1 = function() { execute('set_pickedq'); };
+
+        $scope.reg = { user: '', pass: '' };
         $scope.register = function () {
-            Restangular.all('register').post({ username: 'user', password: '123456' }).then(function (data) {
+            Restangular.all('register').post({ username: $scope.reg.user, password: $scope.reg.pass }).then(function (data) {
                 $ionicPopup.alert({
                     template: JSON.stringify(data)
                 });
@@ -132,7 +134,7 @@ angular.module('sinfApp.controllers', [])
                         return orderline.Picked;
                     }).length;
 
-                    order.Processed = Math.round(numProcessed / order.OrderLines.length, 2) * 100;
+                    order.Processed = Math.round(numProcessed / order.OrderLines.length) * 100;
                 });
             });
         };
@@ -332,7 +334,7 @@ angular.module('sinfApp.controllers', [])
                         return supplyline.Picked;
                     }).length;
 
-                    supply.Processed = Math.round(numProcessed / supply.SupplyLines.length, 2) * 100;
+                    supply.Processed = Math.round(numProcessed / supply.SupplyLines.length) * 100;
                 });
             });
         };
