@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using ADODB;
 using Interop.ErpBS800;
 using Interop.GcpBE800;
@@ -804,18 +805,32 @@ namespace Picking.Lib_Primavera
 
         public bool Login(string username, string password)
         {
-            var passwordHash = _platform.Criptografia.Encripta(password, 50);
+            try
+            {
+                var passwordHash = _platform.Criptografia.Encripta(password, 50);
 
-            var list = _engine.Consulta(String.Format("SELECT * FROM TDU_Pickers WHERE CDU_username = '{0}' AND CDU_passwordHash LIKE '{1}'", username, passwordHash));
-            return list.NumLinhas() > 0;
+                var list = _engine.Consulta(String.Format("SELECT * FROM TDU_Pickers WHERE CDU_username = '{0}' AND CDU_passwordHash LIKE '{1}'", username, passwordHash));
+                return list.NumLinhas() > 0;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
         }
 
         public bool Register(string username, string password)
         {
-            var passwordHash = _platform.Criptografia.Encripta(password, 50);
+            try
+            {
+                var passwordHash = _platform.Criptografia.Encripta(password, 50);
 
-            var noChanges = ExecuteQuery(String.Format("INSERT INTO TDU_Pickers (CDU_username, CDU_passwordHash) VALUES ('{0}', '{1}')", username, passwordHash));
-            return noChanges > 0;
+                var noChanges = ExecuteQuery(String.Format("INSERT INTO TDU_Pickers (CDU_username, CDU_passwordHash) VALUES ('{0}', '{1}')", username, passwordHash));
+                return noChanges > 0;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
         }
     }
 }

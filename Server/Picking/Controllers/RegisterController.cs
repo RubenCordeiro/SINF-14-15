@@ -10,7 +10,7 @@ namespace Picking.Controllers
 {
     public class RegisterController : ApiController
     {
-        // POST /api/login
+        // POST /api/register
         public string Post(UserPassword loginInfo)
         {
             if (!_company.Register(loginInfo.username, loginInfo.password))
