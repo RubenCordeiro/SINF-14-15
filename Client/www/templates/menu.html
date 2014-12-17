@@ -13,7 +13,7 @@
         </header>
         <ion-content class="has-header">
             <ion-list>
-                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/home">
+                <ion-item class="item-icon-left" nav-clear menu-close ui-sref="app.home">
                     <i class="icon ion-home"></i>
                     Home
                 </ion-item>
@@ -21,12 +21,20 @@
                     <i class="icon ion-log-in"></i>
                     Login
                 </ion-item>
-                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/picking">
-                    <i class="icon ion-ios7-upload"></i>
+                <ion-item class="item-icon-left" nav-clear menu-close ui-sref="app.pickingLists">
+                    <i class="icon ion-ios-list"></i>
+                    Picking List
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close ui-sref="app.picking">
+                    <i class="icon ion-ios-upload"></i>
                     Picking
                 </ion-item>
-                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/putaway">
-                    <i class="icon ion-ios7-download"></i>
+                <ion-item class="item-icon-left" nav-clear menu-close ui-sref="app.putawayLists">
+                    <i class="icon ion-ios-list-outline"></i>
+                    Putaway List
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close ui-sref="app.putaway">
+                    <i class="icon ion-ios-download-outline"></i>
                     Putaway
                 </ion-item>
             </ion-list>

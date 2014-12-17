@@ -33,22 +33,6 @@
             </label>
             <button ng-click="pickSelected()" ng-disabled="!anySelectedOrder()" class="button button-dark button-block">Pick Selected</button>
         </ion-list>
-        <p></p>
-        <ion-list>
-            <ion-toggle ng-model="showDelivered" toggle-class="toggle-positive">Show Delivered</ion-toggle>
-            <ion-item class="item-divider" ng-show="showDelivered">
-                Delivered
-            </ion-item>
-            <ion-item class="animate-repeat" ng-repeat="order in orders" ng-show="showDelivered">
-                <h2>{{order.Id}}</h2>
-
-                <span class="item-note">
-                    {{order.Date | amDateFormat:'YYYY-MM-DD HH:mm'}}
-                </span>
-                <p>{{order.Entity}}</p>
-
-            </ion-item>
-        </ion-list>
     </ion-content>
     <div class="bar bar-footer">
         <button class="button icon ion-information-circled pull-right" ng-click="showHelp()"></button>

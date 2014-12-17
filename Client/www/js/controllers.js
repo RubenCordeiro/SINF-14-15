@@ -49,6 +49,48 @@ angular.module('sinfApp.controllers', [])
         $scope.setPickedq1 = function() { execute('set_pickedq'); }
     })
 
+    .controller('PickingListsCtrl', function ($scope, Restangular, $ionicPopup, $ionicLoading) {
+        $scope.init = function () {
+
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
+            Restangular.all('pickinglists').getList().then(function (data) {
+                $scope.pickingLists = data;
+                $ionicLoading.hide();
+            }, function (err) {
+                $ionicLoading.hide();
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: '<p>An error ocurred: ' + JSON.stringify(err) + '</p>'
+                });
+            });
+        };
+    })
+
+    .controller('PickingListCtrl', function ($scope, $stateParams, Restangular, $ionicPopup, $ionicLoading) {
+        $scope.id = $stateParams.id;
+
+        $scope.init = function () {
+
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
+            Restangular.one('pickinglists', $stateParams.id).get().then(function (data) {
+                $scope.pickingList = data;
+                $ionicLoading.hide();
+            }, function (err) {
+                $ionicLoading.hide();
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: '<p>An error ocurred: ' + JSON.stringify(err) + '</p>'
+                });
+            });
+        };
+    })
+
     .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService, $ionicLoading) {
 
         $scope.orders = [];

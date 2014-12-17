@@ -454,6 +454,7 @@ namespace Picking.Lib_Primavera
                         Unit = objListLin.Valor("CDU_unit")
                     };
 
+                    pickingItem.StorageFacility = ExtractFacility(pickingItem.StorageLocation);
                     pickingItem.PickedQuantity = pickingItem.Quantity;
 
                     pickingItems.Add(pickingItem);
@@ -465,6 +466,18 @@ namespace Picking.Lib_Primavera
             }
 
             return pickingLists;
+        }
+
+        private static string ExtractFacility(string location)
+        {
+            if (!string.IsNullOrWhiteSpace(location))
+            {
+                var splits = location.Split('.');
+                if (splits.Length > 0)
+                    return splits[0];
+            }
+
+            return string.Empty;
         }
 
         public PickingList GetPickingList(int id)
@@ -499,6 +512,7 @@ namespace Picking.Lib_Primavera
                     Unit = objListLin.Valor("CDU_unit")
                 };
 
+                pickingItem.StorageFacility = ExtractFacility(pickingItem.StorageLocation);
                 pickingItem.PickedQuantity = pickingItem.Quantity;
 
                 pickingItems.Add(pickingItem);
