@@ -117,6 +117,9 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\ApiIdentity.cs" />
+    <Compile Include="Controllers\AuthorizedApiController.cs" />
+    <Compile Include="Controllers\BasicAuthenticationAttribute.cs" />
     <Compile Include="Controllers\DebugController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
     <Compile Include="Controllers\LocationsController.cs" />
