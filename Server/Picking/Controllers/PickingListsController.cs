@@ -119,6 +119,8 @@ namespace Picking.Controllers
 
                     _company.MarkOrderLinePicked(item.OrderLineId, false);
                 }
+
+                _company.SetOrderLinePickedQuantity(item.OrderLineId, item.PickedQuantity);
             }
 
             _company.InsertPickingItems(itemsList);
