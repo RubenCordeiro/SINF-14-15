@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using Picking.Lib_Primavera;
@@ -127,6 +129,22 @@ namespace Picking.Controllers
                 errors.Add(err2);
 
             return errors;
+        }
+
+        // GET /api/pickinglists
+        public IEnumerable<PickingList> Get()
+        {
+            return _company.ListPickingLists();
+        }
+
+        // GET /api/pickinglists/<id>
+        public PickingList Get(int id)
+        {
+            var pickingList = _company.GetPickingList(id);
+            if (pickingList == null)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            return pickingList;
         }
 
         private static ItemStock GetClosestStockLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)

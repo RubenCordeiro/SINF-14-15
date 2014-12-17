@@ -422,6 +422,94 @@ namespace Picking.Lib_Primavera
             return dv;
         }
 
+        public List<PickingList> ListPickingLists()
+        {
+            EnsureInitialized();
+
+            var objListCab = _engine.Consulta("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PickingList");
+
+            var pickingLists = new List<PickingList>();
+
+            for (; !objListCab.NoFim(); objListCab.Seguinte())
+            {
+                var pickingList = new PickingList
+                {
+                    Id = objListCab.Valor("CDU_id"),
+                    Date = objListCab.Valor("CDU_date"),
+                    PickerName = objListCab.Valor("CDU_pickerName")
+                };
+
+                var pickingItems = new List<PickingItem>();
+                var objListLin = _engine.Consulta(
+                    string.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id",
+                    pickingList.Id));
+
+                for (; !objListLin.NoFim(); objListLin.Seguinte())
+                {
+                    var pickingItem = new PickingItem
+                    {
+                        ItemId = objListLin.Valor("CDU_itemId"),
+                        StorageLocation = objListLin.Valor("CDU_storageLocation"),
+                        Quantity = objListLin.Valor("CDU_quantity"),
+                        Unit = objListLin.Valor("CDU_unit")
+                    };
+
+                    pickingItem.PickedQuantity = pickingItem.Quantity;
+
+                    pickingItems.Add(pickingItem);
+                }
+
+                pickingList.Items = pickingItems;
+                pickingList.SkippedOrders = new List<OrderLine>();
+                pickingLists.Add(pickingList);
+            }
+
+            return pickingLists;
+        }
+
+        public PickingList GetPickingList(int id)
+        {
+            EnsureInitialized();
+
+            var objListCab =
+                _engine.Consulta(
+                    string.Format("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PickingList WHERE CDU_id={0}", id));
+
+            if (objListCab.Vazia())
+                return null;
+
+            var pickingList = new PickingList
+            {
+                Id = objListCab.Valor("CDU_id"),
+                Date = objListCab.Valor("CDU_date"),
+                PickerName = objListCab.Valor("CDU_pickerName")
+            };
+
+            var pickingItems = new List<PickingItem>();
+            var objListLin = _engine.Consulta(
+                string.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id", pickingList.Id));
+
+            for (; !objListLin.NoFim(); objListLin.Seguinte())
+            {
+                var pickingItem = new PickingItem
+                {
+                    ItemId = objListLin.Valor("CDU_itemId"),
+                    StorageLocation = objListLin.Valor("CDU_storageLocation"),
+                    Quantity = objListLin.Valor("CDU_quantity"),
+                    Unit = objListLin.Valor("CDU_unit")
+                };
+
+                pickingItem.PickedQuantity = pickingItem.Quantity;
+
+                pickingItems.Add(pickingItem);
+            }
+
+            pickingList.Items = pickingItems;
+            pickingList.SkippedOrders = new List<OrderLine>();
+
+            return pickingList;
+        }
+
         public List<Order> ListOrders()
         {
             EnsureInitialized();
