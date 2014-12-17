@@ -96,8 +96,8 @@ namespace Picking.Controllers
             return new PickingList {Items = pickingItems, SkippedOrders = skippedOrders};
         }
 
-        // PUT /api/pickinglists/
-        public IEnumerable<string> Put(PickingList pickingList)
+        // PATCH /api/pickinglists
+        public IEnumerable<string> Patch(PickingList pickingList)
         {
             var errors = new List<string>();
             var itemsList = pickingList.Items.ToList();

@@ -184,7 +184,7 @@ angular.module('sinfApp.controllers', [])
                 $scope.items[i].PickedQuantity = parseFloat($scope.items[i].PickedQuantity);
             }
 
-            Restangular.all('pickinglists').put({ Items: $scope.items, SkippedOrders: $scope.skippedOrders}).then(function () {
+            Restangular.all('pickinglists').patch({ Items: $scope.items, SkippedOrders: $scope.skippedOrders}).then(function () {
                 $ionicLoading.hide();
                 $state.go('app.picking');
             }, function (err) {
