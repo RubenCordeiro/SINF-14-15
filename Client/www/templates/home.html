@@ -1,18 +1,40 @@
 <ion-view view-title="Home" enable-menu-with-back-views="false">
     <ion-content padding="true" class="has-header">
-        <h2>Welcome to <i>Pickervera</i></h2>
+        <span class="badge badge-assertive">PrimaDell, Inc.</span>
         <div class="list card">
             <div class="item item-divider">Actions</div>
             <div class="item item-body">
-                <a ui-sref="app.picking" class="button button-balanced button-block">Picking</a>
-                <a ui-sref="app.putaway" class="button button-assertive button-block">Putaway</a>
+                <div class="list">
+                    <a class="item item-icon-left item-icon-right" ui-sref="app.pickingLists">
+                        <i class="icon ion-ios-list"></i>Picking Lists<i class="icon ion-arrow-right-c"></i>
+                    </a>
+                    <a class="item item-icon-left item-icon-right" ui-sref="app.picking">
+                        <i class="icon ion-ios-upload"></i>Perform Picking<i class="icon ion-arrow-right-c"></i>
+                    </a>
+                    <a class="item item-icon-left item-icon-right" ui-sref="app.putawayLists">
+                        <i class="icon ion-ios-list-outline"></i>Putaway Lists<i class="icon ion-arrow-right-c"></i>
+                    </a>
+                    <a class="item item-icon-left item-icon-right" ui-sref="app.putaway">
+                        <i class="icon ion-ios-download-outline"></i>Perform Putaway<i class="icon ion-arrow-right-c"></i>
+                    </a>
+                </div>
             </div>
             <div class="item item-divider">Debug (development only)</div>
             <div class="item item-body">
-                <button ng-click="setPicked0()" class="button button-calm button-block">Set Picked = 0</button>
-                <button ng-click="setPicked1()" class="button button-calm button-block">Set Picked = 1</button>
-                <button ng-click="setPickedq0()" class="button button-calm button-block">Set PickedQuantity = 0</button>
-                <button ng-click="setPickedq1()" class="button button-calm button-block">Set PickedQuantity = all</button>
+                <div class="list">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPicked0()">
+                        <i class="icon ion-bug"></i>Set Picked = 0<i class="icon ion-arrow-return-right"></i>
+                    </a>
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPicked1()">
+                        <i class="icon ion-bug"></i>Set Picked = 1<i class="icon ion-arrow-return-right"></i>
+                    </a>
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPickedq0()">
+                        <i class="icon ion-bug"></i>Set PickedQuantity = 0<i class="icon ion-arrow-return-right"></i>
+                    </a>
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPickedq1()">
+                        <i class="icon ion-bug"></i>Set PickedQuantity = all<i class="icon ion-arrow-return-right"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </ion-content>
