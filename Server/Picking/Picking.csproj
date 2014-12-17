@@ -135,7 +135,10 @@
     <Compile Include="Lib_Primavera\Model\Item.cs" />
     <Compile Include="Lib_Primavera\Model\ItemStock.cs" />
     <Compile Include="Lib_Primavera\Model\Order.cs" />
+    <Compile Include="Lib_Primavera\Model\PutawaySelection.cs" />
+    <Compile Include="Lib_Primavera\Model\PutawayItem.cs" />
     <Compile Include="Lib_Primavera\Model\PickingItem.cs" />
+    <Compile Include="Lib_Primavera\Model\PutawayList.cs" />
     <Compile Include="Lib_Primavera\Model\PickingSelection.cs" />
     <Compile Include="Lib_Primavera\Model\PickingList.cs" />
     <Compile Include="Lib_Primavera\Model\StorageLocation.cs" />

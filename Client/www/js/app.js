@@ -118,4 +118,18 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         this.get = function() {
             return { Orders: orders, Facility: facility };
         };
+    })
+
+    .service('putawayListService', function () {
+        var supplies = [];
+        var facility = '';
+
+        this.set = function(s, f) {
+            supplies = s;
+            facility = f;
+        };
+
+        this.get = function() {
+            return { Supplies: supplies, Facility: facility };
+        };
     });

@@ -92,7 +92,6 @@ angular.module('sinfApp.controllers', [])
     })
 
     .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService, $ionicLoading) {
-
         $scope.orders = [];
         $scope.warehouses = [];
         $scope.warehouse = {
@@ -250,27 +249,87 @@ angular.module('sinfApp.controllers', [])
         };
     })
 
-    .controller('PutawayCtrl', function ($scope, $ionicPopup) {
-        $scope.orders = [
-            { checked: false, Id: 'Order 1', Entity: 'EMP1', Date: '2014-12-04T20:40Z', Processed: 0 },
-            { checked: false, Id: 'Order 2', Entity: 'EMP2', Date: '2014-12-04T10:50Z', Processed: 50 },
-            { checked: false, Id: 'Order 3', Entity: 'EMP3', Date: '2014-12-01T14:50Z', Processed: 80 }
-        ];
+    .controller('PutawayCtrl', function ($scope, $state, $ionicPopup, Restangular, putawayListService, $ionicLoading) {
+        $scope.supplies = [];
+        $scope.warehouses = [];
+        $scope.warehouse = {
+            name: ''
+        };
+
+        $scope.init = function () {
+
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
+            Restangular.all('storagefacilities').getList().then(function (data) {
+                $scope.warehouses = data;
+                if ($scope.warehouses.length > 0) {
+                    $scope.warehouse.name = $scope.warehouses[0];
+                }
+
+                $ionicLoading.hide();
+            }, function () {
+                $ionicLoading.hide();
+            });
+
+            Restangular.all('supplies').getList().then(function (data) {
+                $scope.supplies = data;
+
+
+                _.each($scope.supplies, function(supply) {
+                    var numProcessed = _.filter(supply.SupplyLines, function(supplyline) {
+                        return supplyline.Picked;
+                    }).length;
+
+                    supply.Processed = Math.round(numProcessed / supply.SupplyLines.length, 2) * 100;
+                });
+            });
+        };
 
         $scope.automaticChange = function (val) {
-            for (var i = 0; i < $scope.orders.length; ++i) {
-                $scope.orders[i].checked = val;
+            for (var i = 0; i < $scope.supplies.length; ++i) {
+                $scope.supplies[i].checked = val;
             }
         };
 
         $scope.search = { Id: '', Entity: '', $:''};
         $scope.filterType = 'Id';
 
+        $scope.anySelectedSupply = function () {
+            return _.any($scope.supplies, function (supply) {
+                return supply.checked;
+            });
+        };
+
         $scope.showHelp = function() {
             $ionicPopup.alert({
                 title: 'Help Text',
-                template: '<p><strong>Automatic</strong> mode: orders are selected automatically<br><strong>Manual</strong> mode: select orders to putaway</p>'
+                template: '<p><strong>Automatic</strong> mode: supplies are selected automatically<br><strong>Manual</strong> mode: select supplies to putaway</p>'
             });
+        };
+
+        $scope.putawaySelected = function() {
+            var checkedSupplies = _.filter($scope.supplies, function (supply) {
+                return supply.checked;
+            });
+
+            var checkedSuppliesIds = _.pluck(checkedSupplies, 'NumDoc');
+
+            putawayListService.set(checkedSuppliesIds, $scope.warehouse.name);
+            $state.go('app.putawayResult');
+        };
+
+        $scope.toggleSupply = function(Supply) {
+            if ($scope.isSupplyShown(Supply)) {
+                $scope.shownSupply = null;
+            } else {
+                $scope.shownSupply = Supply;
+            }
+        };
+
+        $scope.isSupplyShown = function(Supply) {
+            return $scope.shownSupply === Supply;
         };
     })
 

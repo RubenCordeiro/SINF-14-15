@@ -349,8 +349,11 @@ namespace Picking.Lib_Primavera
                         IdCabecCompras = objListLin.Valor("IdCabecCompras"),
                         Id = objListLin.Valor("Id"),
                         LineNo = objListLin.Valor("NumLinha"),
-                        ItemId = objListLin.Valor("Artigo"),
-                        ItemDescription = objListLin.Valor("Descricao"),
+                        Item = new Item
+                        {
+                            Id = objListLin.Valor("Artigo"),
+                            Description = objListLin.Valor("Descricao")
+                        },
                         Quantity = objListLin.Valor("Quantidade"),
                         Unit = objListLin.Valor("Unidade"),
                         Discount = objListLin.Valor("Desconto1"),
@@ -405,8 +408,11 @@ namespace Picking.Lib_Primavera
                     IdCabecCompras = objListLin.Valor("IdCabecCompras"),
                     Id = objListLin.Valor("Id"),
                     LineNo = objListLin.Valor("NumLinha"),
-                    ItemId = objListLin.Valor("Artigo"),
-                    ItemDescription = objListLin.Valor("Descricao"),
+                    Item = new Item
+                    {
+                        Id = objListLin.Valor("Artigo"),
+                        Description = objListLin.Valor("Descricao")
+                    },
                     Quantity = objListLin.Valor("Quantidade"),
                     Unit = objListLin.Valor("Unidade"),
                     Discount = objListLin.Valor("Desconto1"),
@@ -472,18 +478,6 @@ namespace Picking.Lib_Primavera
             }
 
             return pickingLists;
-        }
-
-        private static string ExtractFacility(string location)
-        {
-            if (!string.IsNullOrWhiteSpace(location))
-            {
-                var splits = location.Split('.');
-                if (splits.Length > 0)
-                    return splits[0];
-            }
-
-            return string.Empty;
         }
 
         public PickingList GetPickingList(int id)
@@ -643,6 +637,18 @@ namespace Picking.Lib_Primavera
         {
             if (!_initialized)
                 throw new Exception("Company not initialized!");
+        }
+
+        private static string ExtractFacility(string location)
+        {
+            if (!string.IsNullOrWhiteSpace(location))
+            {
+                var splits = location.Split('.');
+                if (splits.Length > 0)
+                    return splits[0];
+            }
+
+            return string.Empty;
         }
 
         private bool _initialized;
