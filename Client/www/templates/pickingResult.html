@@ -1,7 +1,4 @@
-<ion-view title="Picking {{title}} | Pickervera" ng-init="init()">
-    <!--<ion-nav-buttons side="left">
-        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
-    </ion-nav-buttons>-->
+<ion-view view-title="Picking {{title}}" ng-init="init()">
     <ion-content padding="true" class="has-header">
         <ul class="list">
             <li class="item" ng-repeat="item in items" ng-disabled="item.disabled">
@@ -34,6 +31,6 @@
         </ion-list>
     </ion-content>
     <div class="bar bar-clear bar-footer">
-        <a ng-disabled="!enableFinish" ng-click="finished()" nav-clear class="button button-positive pull-right">Finished</a>
+        <a ng-disabled="!enableFinish" ng-click="finished()" class="button button-positive pull-right">Finished</a>
     </div>
 </ion-view>
