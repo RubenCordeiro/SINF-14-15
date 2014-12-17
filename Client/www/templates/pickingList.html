@@ -1,35 +1,34 @@
-<ion-view title="Picking List {{id}} | Pickervera" ng-init="init()">
-    <ion-nav-buttons side="left">
-        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
-    </ion-nav-buttons>
+<ion-view view-title="Picking List {{id}}" ng-init="init()">
     <ion-content padding="true" class="has-header">
-        <div class="list card">
+        <div class="list card card">
 
-            <div class="item">
-                <h2>Id {{pickingList.Id}}</h2>
+            <div class="item item-divider">
+                Id {{pickingList.Id}}
+            </div>
+            <div class="item item-text-wrap">
                 <p>{{pickingList.Items.length}} items in {{pickingList.Items[0].StorageFacility}}</p>
-                <p>By <strong>{{pickingList.PickerName}}</strong>, {{pickingList.Date | amCalendar}}</p>
+                <p><strong>Picker: </strong> {{pickingList.PickerName}}</p>
+                <p><strong>Date: </strong> {{pickingList.Date | amCalendar}} <small>({{pickingList.Date | amDateFormat:'YYYY-MM-DD HH:mm'}})</small></p>
             </div>
 
             <div class="item item-body">
                 <ion-list>
+                    <ion-item class="item-divider">
+                        <div class="row">
+                            <div class="col">Item Id</div>
+                            <div class="col">Quantity</div>
+                            <div class="col">Location</div>
+                        </div>
+                    </ion-item>
                     <ion-item class="animate-repeat" ng-repeat="item in pickingList.Items">
-                        <h2>Id {{item.ItemId}}</h2>
-                        <p>{{item.Quantity}} {{item.Unit}} at {{item.StorageLocation}}</p>
+                        <div class="row">
+                            <div class="col">{{item.ItemId}}</div>
+                            <div class="col">{{item.Quantity}} {{item.Unit}}</div>
+                            <div class="col">{{item.StorageLocation}}</div>
+                        </div>
                     </ion-item>
                 </ion-list>
             </div>
         </div>
-        <!--
-        <h2>Id {{pickingList.Id}}</h2>
-        <p>{{pickingList.Items.length}} items in {{pickingList.Items[0].StorageFacility}}</p>
-        <p>By <strong>{{pickingList.PickerName}}</strong>, {{pickingList.Date | amCalendar}}</p>
-        <ion-list>
-            <ion-item ui-sref="app.pickingList({ id: pickingList.Id })" class="animate-repeat" ng-repeat="pickingList in pickingLists">
-                <h2>Id {{pickingList.Id}}</h2>
-                <p>{{pickingList.Items.length}} items in {{pickingList.Items[0].StorageFacility}}</p>
-                <p>By <strong>{{pickingList.PickerName}}</strong>, {{pickingList.Date | amCalendar}}</p>
-            </ion-item>
-        </ion-list> -->
     </ion-content>
 </ion-view>
