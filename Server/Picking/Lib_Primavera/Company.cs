@@ -512,7 +512,7 @@ namespace Picking.Lib_Primavera
             var maxId = (int) objListLin.Valor("id");
 
             ExecuteQuery("INSERT INTO TDU_PickingList (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
-                maxId + 1, DateTime.Now.ToString("yyyy-mm-dd hh:MM:ss.000"), "Zebino");
+                maxId + 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.000"), "Zebino");
 
             var i = 0;
             foreach (var item in items)
