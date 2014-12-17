@@ -24,9 +24,7 @@ namespace Picking.Lib_Primavera.Model
 
     public class OrderLine
     {
-        public string ItemId { get; set; }
-
-        public string ItemDescription { get; set; }
+        public Item Item { get; set; }
 
         public int LineNo { get; set; }
 

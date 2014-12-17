@@ -83,7 +83,7 @@ namespace Picking.Lib_Primavera
 
             var lines = new GcpBELinhasDocumentoStock();
 
-            var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.ItemId, Armazem: item.StorageFacility, Localizacao: item.StorageLocation, Quantidade: quantity, EntradaSaida: "S", TipoDocStock: "SS");
+            var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.Item.Id, Armazem: item.StorageFacility, Localizacao: item.StorageLocation, Quantidade: quantity, EntradaSaida: "S", TipoDocStock: "SS");
             for (var i = 1; i <= itemLines.NumItens; ++i)
             {
                 var line = itemLines.get_Edita(i);
@@ -120,7 +120,7 @@ namespace Picking.Lib_Primavera
 
             foreach (var item in items)
             {
-                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.ItemId, Armazem: facility, Localizacao: facilityOut, Quantidade: item.PickedQuantity, TipoDocStock: "TRA");
+                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.Item.Id, Armazem: facility, Localizacao: facilityOut, Quantidade: item.PickedQuantity, TipoDocStock: "TRA");
                 for (var i = 1; i <= itemLines.NumItens; ++i)
                 {
                     var line = itemLines.get_Edita(i);
@@ -260,8 +260,11 @@ namespace Picking.Lib_Primavera
                 {
                     IdCabecDoc = objListLin.Valor("idCabecDoc"),
                     LineNo = objListLin.Valor("NumLinha"),
-                    ItemId = objListLin.Valor("Artigo"),
-                    ItemDescription = objListLin.Valor("Descricao"),
+                    Item = new Item
+                    {
+                        Id = objListLin.Valor("Artigo"),
+                        Description = objListLin.Valor("Descricao")
+                    },
                     Quantity = objListLin.Valor("Quantidade"),
                     Unit = objListLin.Valor("Unidade"),
                     Discount = objListLin.Valor("Desconto1"),
@@ -448,7 +451,10 @@ namespace Picking.Lib_Primavera
                 {
                     var pickingItem = new PickingItem
                     {
-                        ItemId = objListLin.Valor("CDU_itemId"),
+                        Item = new Item
+                        {
+                            Id = objListLin.Valor("CDU_itemId")
+                        },
                         StorageLocation = objListLin.Valor("CDU_storageLocation"),
                         Quantity = objListLin.Valor("CDU_quantity"),
                         Unit = objListLin.Valor("CDU_unit")
@@ -506,7 +512,10 @@ namespace Picking.Lib_Primavera
             {
                 var pickingItem = new PickingItem
                 {
-                    ItemId = objListLin.Valor("CDU_itemId"),
+                    Item = new Item
+                    {
+                        Id = objListLin.Valor("CDU_itemId")
+                    },
                     StorageLocation = objListLin.Valor("CDU_storageLocation"),
                     Quantity = objListLin.Valor("CDU_quantity"),
                     Unit = objListLin.Valor("CDU_unit")
@@ -559,8 +568,11 @@ namespace Picking.Lib_Primavera
                         Id = objListLin.Valor("Id"),
                         IdCabecDoc = objListLin.Valor("idCabecDoc"),
                         LineNo = objListLin.Valor("NumLinha"),
-                        ItemId = objListLin.Valor("Artigo"),
-                        ItemDescription = objListLin.Valor("Descricao"),
+                        Item = new Item
+                        {
+                            Id = objListLin.Valor("Artigo"),
+                            Description = objListLin.Valor("Descricao")
+                        },
                         Quantity = objListLin.Valor("Quantidade"),
                         Unit = objListLin.Valor("Unidade"),
                         Discount = objListLin.Valor("Desconto1"),
@@ -621,7 +633,7 @@ namespace Picking.Lib_Primavera
             {
                 ExecuteQuery(
                     "INSERT INTO TDU_PickingItems (CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity," +
-                    "CDU_unit) VALUES ({0}, {1}, '{2}', '{3}', {4}, '{5}')", i, maxId + 1, item.ItemId, 
+                    "CDU_unit) VALUES ({0}, {1}, '{2}', '{3}', {4}, '{5}')", i, maxId + 1, item.Item.Id, 
                         item.StorageLocation, item.PickedQuantity, item.Unit);
                 ++i;
             }

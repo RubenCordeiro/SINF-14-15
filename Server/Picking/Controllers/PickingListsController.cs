@@ -41,7 +41,7 @@ namespace Picking.Controllers
                     if (Math.Abs(orderLine.PickedQuantity - orderLine.Quantity) < Double.Epsilon * 100)
                         continue;
 
-                    var stock = GetStock(orderLine.ItemId)
+                    var stock = GetStock(orderLine.Item.Id)
                         .Where(itemStock => itemStock.Stock > 0 && itemStock.StorageFacility == selection.Facility)
                         .OrderByDescending(itemStock => itemStock.Stock) // Prioritize by stock quantity
                         .Where(itemStock => Location.FromString(itemStock.StorageLocation) != null) // Only valid locations
@@ -81,8 +81,7 @@ namespace Picking.Controllers
                         var pickingItem = new PickingItem
                         {
                             OrderLineId = orderLine.Id,
-                            ItemId = orderLine.ItemId,
-                            ItemDescription = orderLine.ItemDescription,
+                            Item = orderLine.Item,
                             Quantity = quantity,
                             Unit = orderLine.Unit,
                             StorageFacility = stockLocation.StorageFacility,

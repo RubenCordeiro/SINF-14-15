@@ -22,8 +22,8 @@
                 Skipped Orders (no stock)
             </div>
             <ion-item class="item" ng-repeat="order in skippedOrders" ng-show="showSkippedOrders">
-                <h2>{{order.ItemId}}</h2>
-                <h3>{{order.ItemDescription}}</h3>
+                <h2>{{order.Item.Id}}</h2>
+                <h3>{{order.Item.Description}}</h3>
                 <div class="item-note">
                     {{order.Quantity}} {{order.Unit}}
                 </div>
