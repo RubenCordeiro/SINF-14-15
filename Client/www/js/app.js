@@ -4,7 +4,69 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'restangular'])
+angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'restangular', 'ngCookies'])
+
+    // singleton, this service can be injected into any route in order to check the current user session information
+    .provider('AuthService', function AuthServiceProvider() {
+
+        var currentUser;
+
+        function token() {
+            if (currentUser && currentUser.access_token)
+                return currentUser.access_token;
+            else
+                return null;
+        }
+
+        this.token = token;
+
+        function CurrentUser($cookieStore) {
+
+            this.storage = $cookieStore;
+
+            this.login = function (user, access_token) {
+                if (user && access_token) {
+                    currentUser = user;
+                    currentUser.access_token = access_token;
+                    this.storage.put('user', user);
+                    this.storage.put('token', access_token);
+                }
+            };
+
+            this.logout = function () {
+                this.storage.remove('user');
+                this.storage.remove('token');
+                currentUser = null;
+            };
+
+            this.isLoggedIn = function () {
+                return currentUser != null;
+            };
+
+            this.currentUser = function () {
+                return currentUser;
+            };
+
+            this.token = token;
+        }
+
+        this.$get = ['$cookieStore', function ($cookieStore) {
+            return new CurrentUser($cookieStore);
+        }];
+    })
+
+    .service('AlertPopupService', ['$ionicPopup', function ($ionicPopup) {
+
+        this.createPopup = function (headerMessage, bodyMessage, okAction) {
+            $ionicPopup.alert({
+                title: headerMessage,
+                content: bodyMessage
+            }).then(function (res) {
+                if (okAction)
+                    okAction();
+            });
+        }
+    }])
 
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
@@ -20,7 +82,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         });
     })
 
-    .config(function ($stateProvider, $urlRouterProvider, RestangularProvider) {
+    .config(function ($stateProvider, $urlRouterProvider, RestangularProvider, AuthServiceProvider) {
         $stateProvider
 
             .state('app', {
@@ -124,6 +186,12 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         $urlRouterProvider.otherwise('/app/home');
 
         RestangularProvider.setBaseUrl("http://192.168.108.189/Picking/api");
+
+        RestangularProvider.addFullRequestInterceptor(function (element, operation, what, url, headers) {
+            return {
+                headers: _.extend(headers, {'Authorization': AuthServiceProvider.token()})
+            }
+        });
     })
 
     .service('pickingListService', function () {

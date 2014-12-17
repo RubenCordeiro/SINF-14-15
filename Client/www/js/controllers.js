@@ -1,6 +1,6 @@
 angular.module('sinfApp.controllers', [])
 
-    .controller('AppCtrl', function ($scope, $ionicModal, $timeout) {
+    .controller('AppCtrl', function ($scope, Restangular, AuthService, AlertPopupService, $ionicModal) {
         // Form data for the login modal
         $scope.loginData = {};
 
@@ -18,18 +18,19 @@ angular.module('sinfApp.controllers', [])
 
         // Open the login modal
         $scope.login = function () {
-            $scope.modal.show();
+            if (!AuthService.isLoggedIn()) $scope.modal.show();
         };
 
         // Perform the login action when the user submits the login form
         $scope.doLogin = function () {
             console.log('Doing login', $scope.loginData);
 
-            // Simulate a login delay. Remove this and replace with your login
-            // code if using a login system
-            $timeout(function () {
+            Restangular.all('login').post($scope.loginData).then(function (data) {
+                AuthService.login($scope.loginData.username, date);
                 $scope.closeLogin();
-            }, 1000);
+            }, function (response) {
+                AlertPopupService.createPopup("Error", response.data.error);
+            });
         };
     })
 
@@ -47,6 +48,13 @@ angular.module('sinfApp.controllers', [])
         $scope.setPicked1 =  function() { execute('set_picked'); }
         $scope.setPickedq0 = function() { execute('reset_pickedq'); }
         $scope.setPickedq1 = function() { execute('set_pickedq'); }
+        $scope.register = function () {
+            Restangular.all('register').post({ loginInfo : { username: 'user', password: '123456' }}).then(function (data) {
+                $ionicPopup.alert({
+                    template: JSON.stringify(data)
+                });
+            });
+        }
     })
 
     .controller('PickingListsCtrl', function ($scope, Restangular, $ionicPopup, $ionicLoading) {
