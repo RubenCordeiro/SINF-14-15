@@ -13,6 +13,9 @@ namespace Picking.Lib_Primavera
 {
     public class Company
     {
+
+        #region Initialization
+
         public static string COMPANY = "PRIMADELL";
 
         public Company(string name, string user = "", string password = "")
@@ -68,6 +71,10 @@ namespace Picking.Lib_Primavera
 
             return true;
         }
+
+        #endregion
+
+        #region Document Generation
 
         public string GenerateStockRemovalDocument(PickingItem item, double quantity)
         {
@@ -138,6 +145,10 @@ namespace Picking.Lib_Primavera
             return avisos;
         }
 
+        #endregion
+
+        #region Items
+
         public Item GetItem(string id)
         {
             EnsureInitialized();
@@ -172,6 +183,34 @@ namespace Picking.Lib_Primavera
 
             return result;
         }
+
+        public List<ItemStock> ListItemStock()
+        {
+            EnsureInitialized();
+
+            var result = new List<ItemStock>();
+
+            for (
+                var objItemStocksList =
+                    _engine.Consulta("SELECT Artigo, Armazem, StkActual, Localizacao FROM ArtigoArmazem");
+                !objItemStocksList.NoFim();
+                objItemStocksList.Seguinte())
+            {
+                result.Add(new ItemStock
+                {
+                    Item = objItemStocksList.Valor("Artigo"),
+                    Stock = objItemStocksList.Valor("StkActual"),
+                    StorageFacility = objItemStocksList.Valor("Armazem"),
+                    StorageLocation = objItemStocksList.Valor("Localizacao"),
+                });
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Facilities & Locations
 
         public StorageLocation GetStorageLocation(string location)
         {
@@ -227,7 +266,71 @@ namespace Picking.Lib_Primavera
             }
 
             return result;
-        } 
+        }
+
+        #endregion
+
+        #region Orders
+
+        public List<Order> ListOrders()
+        {
+            EnsureInitialized();
+
+            var objListCab =
+                _engine.Consulta("SELECT id, Entidade, Clientes.Nome as EntidadeNome, Data, NumDoc, TotalMerc, Serie FROM CabecDoc INNER JOIN Clientes ON Clientes.Cliente = CabecDoc.Entidade where TipoDoc='ECL'");
+
+            var listDv = new List<Order>();
+
+            for (; !objListCab.NoFim(); objListCab.Seguinte())
+            {
+                var dv = new Order
+                {
+                    Id = objListCab.Valor("id"),
+                    Entity = objListCab.Valor("Entidade"),
+                    EntityName = objListCab.Valor("EntidadeNome"),
+                    NumDoc = objListCab.Valor("NumDoc"),
+                    Data = objListCab.Valor("Data"),
+                    TotalMerc = objListCab.Valor("TotalMerc"),
+                    Serie = objListCab.Valor("Serie")
+                };
+
+                var listLinDv = new List<OrderLine>();
+                var objListLin = _engine.Consulta(
+                    "SELECT idCabecDoc, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Picked, CDU_PickedQuantity from LinhasDoc where IdCabecDoc='" +
+                    dv.Id + "' order By NumLinha"
+                );
+
+                for (; !objListLin.NoFim(); objListLin.Seguinte())
+                {
+                    var linDv = new OrderLine
+                    {
+                        Id = objListLin.Valor("Id"),
+                        IdCabecDoc = objListLin.Valor("idCabecDoc"),
+                        LineNo = objListLin.Valor("NumLinha"),
+                        Item = new Item
+                        {
+                            Id = objListLin.Valor("Artigo"),
+                            Description = objListLin.Valor("Descricao")
+                        },
+                        Quantity = objListLin.Valor("Quantidade"),
+                        Unit = objListLin.Valor("Unidade"),
+                        Discount = objListLin.Valor("Desconto1"),
+                        UnitPrice = objListLin.Valor("PrecUnit"),
+                        TotalINet = objListLin.Valor("TotalILiquido"),
+                        TotalNet = objListLin.Valor("PrecoLiquido"),
+                        Picked = objListLin.Valor("CDU_Picked") == 1,
+                        PickedQuantity = objListLin.Valor("CDU_PickedQuantity")
+                    };
+
+                    listLinDv.Add(linDv);
+                }
+
+                dv.OrderLines = listLinDv;
+                listDv.Add(dv);
+            }
+
+            return listDv;
+        }
 
         public Order GetOrder(int numdoc)
         {
@@ -283,36 +386,9 @@ namespace Picking.Lib_Primavera
             return dv;
         }
 
-        public void MarkOrderLinePicked(string orderLineId, bool picked = true)
-        {
-            ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = {0} WHERE Id = '{1}'", picked ? 1 : 0, orderLineId);
+        #endregion
 
-            /* old, slow
-            var doc = _engine.Comercial.Vendas.EditaID(order.Id);
-            var fields = new StdBECampos();
-            fields.Insere(new StdBECampo { Nome = "CDU_Picked", Valor = 1 });
-            var line = doc.get_Linhas().get_Edita(orderLine.LineNo);
-            line.set_CamposUtil(fields);
-            _engine.Comercial.Vendas.Actualiza(doc);
-             * */
-        }
-
-        public void SetOrderLinePickedQuantity(Order order, OrderLine orderLine, double quantity)
-        {
-            ExecuteQuery("UPDATE LinhasDoc SET CDU_PickedQuantity = {0} WHERE Id = '{1}'", quantity, orderLine.Id);
-        }
-
-        public int ExecuteQuery(string query, params object[] objs)
-        {
-            return ExecuteQuery(string.Format(query, objs));
-        }
-
-        public int ExecuteQuery(string query)
-        {
-            object count;
-            _connection.Execute(query, out count);
-            return (int) count;
-        }
+        #region Supplies
 
         public List<Supply> ListSupplies()
         {
@@ -431,6 +507,29 @@ namespace Picking.Lib_Primavera
             return dv;
         }
 
+        #endregion
+
+        #region Picking
+
+        public void MarkOrderLinePicked(string orderLineId, bool picked = true)
+        {
+            ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = {0} WHERE Id = '{1}'", picked ? 1 : 0, orderLineId);
+
+            /* old, slow
+            var doc = _engine.Comercial.Vendas.EditaID(order.Id);
+            var fields = new StdBECampos();
+            fields.Insere(new StdBECampo { Nome = "CDU_Picked", Valor = 1 });
+            var line = doc.get_Linhas().get_Edita(orderLine.LineNo);
+            line.set_CamposUtil(fields);
+            _engine.Comercial.Vendas.Actualiza(doc);
+             * */
+        }
+
+        public void SetOrderLinePickedQuantity(string orderLineId, double quantity)
+        {
+            ExecuteQuery("UPDATE LinhasDoc SET CDU_PickedQuantity = {0} WHERE Id = '{1}'", quantity, orderLineId);
+        }
+
         public List<PickingList> ListPickingLists()
         {
             EnsureInitialized();
@@ -527,90 +626,6 @@ namespace Picking.Lib_Primavera
             return pickingList;
         }
 
-        public List<Order> ListOrders()
-        {
-            EnsureInitialized();
-
-            var objListCab =
-                _engine.Consulta("SELECT id, Entidade, Clientes.Nome as EntidadeNome, Data, NumDoc, TotalMerc, Serie FROM CabecDoc INNER JOIN Clientes ON Clientes.Cliente = CabecDoc.Entidade where TipoDoc='ECL'");
-
-            var listDv = new List<Order>();
-
-            for (; !objListCab.NoFim(); objListCab.Seguinte())
-            {
-                var dv = new Order
-                {
-                    Id = objListCab.Valor("id"),
-                    Entity = objListCab.Valor("Entidade"),
-                    EntityName = objListCab.Valor("EntidadeNome"),
-                    NumDoc = objListCab.Valor("NumDoc"),
-                    Data = objListCab.Valor("Data"),
-                    TotalMerc = objListCab.Valor("TotalMerc"),
-                    Serie = objListCab.Valor("Serie")
-                };
-
-                var listLinDv = new List<OrderLine>();
-                var objListLin = _engine.Consulta(
-                    "SELECT idCabecDoc, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Picked, CDU_PickedQuantity from LinhasDoc where IdCabecDoc='" +
-                    dv.Id + "' order By NumLinha"
-                );
-
-                for (; !objListLin.NoFim(); objListLin.Seguinte())
-                {
-                    var linDv = new OrderLine
-                    {
-                        Id = objListLin.Valor("Id"),
-                        IdCabecDoc = objListLin.Valor("idCabecDoc"),
-                        LineNo = objListLin.Valor("NumLinha"),
-                        Item = new Item
-                        {
-                            Id = objListLin.Valor("Artigo"),
-                            Description = objListLin.Valor("Descricao")
-                        },
-                        Quantity = objListLin.Valor("Quantidade"),
-                        Unit = objListLin.Valor("Unidade"),
-                        Discount = objListLin.Valor("Desconto1"),
-                        UnitPrice = objListLin.Valor("PrecUnit"),
-                        TotalINet = objListLin.Valor("TotalILiquido"),
-                        TotalNet = objListLin.Valor("PrecoLiquido"),
-                        Picked = objListLin.Valor("CDU_Picked") == 1,
-                        PickedQuantity = objListLin.Valor("CDU_PickedQuantity")
-                    };
-
-                    listLinDv.Add(linDv);
-                }
-
-                dv.OrderLines = listLinDv;
-                listDv.Add(dv);
-            }
-
-            return listDv;
-        }
-
-        public List<ItemStock> ListItemStock()
-        {
-            EnsureInitialized();
-
-            var result = new List<ItemStock>();
-
-            for (
-                var objItemStocksList =
-                    _engine.Consulta("SELECT Artigo, Armazem, StkActual, Localizacao FROM ArtigoArmazem");
-                !objItemStocksList.NoFim();
-                objItemStocksList.Seguinte())
-            {
-                result.Add(new ItemStock
-                {
-                    Item = objItemStocksList.Valor("Artigo"),
-                    Stock = objItemStocksList.Valor("StkActual"),
-                    StorageFacility = objItemStocksList.Valor("Armazem"),
-                    StorageLocation = objItemStocksList.Valor("Localizacao"),
-                });
-            }
-
-            return result;
-        }
-
         public void InsertPickingItems(IEnumerable<PickingItem> items)
         {
             var objListLin = _engine.Consulta(
@@ -633,6 +648,24 @@ namespace Picking.Lib_Primavera
             }
         }
 
+        #endregion
+
+        #region Putaway
+
+        public List<PutawayList> ListPutawayLists()
+        {
+            return new List<PutawayList>();
+        }
+
+        public PutawayList GetPutawayList(int id)
+        {
+            return new PutawayList();
+        }
+
+        #endregion
+
+        #region Utilities
+
         private void EnsureInitialized()
         {
             if (!_initialized)
@@ -651,6 +684,22 @@ namespace Picking.Lib_Primavera
             return string.Empty;
         }
 
+        public int ExecuteQuery(string query, params object[] objs)
+        {
+            return ExecuteQuery(string.Format(query, objs));
+        }
+
+        public int ExecuteQuery(string query)
+        {
+            object count;
+            _connection.Execute(query, out count);
+            return (int)count;
+        }
+
+#endregion
+
+        #region Data
+
         private bool _initialized;
         private string _name;
         private readonly StdPlatBS _platform = new StdPlatBS();
@@ -658,5 +707,7 @@ namespace Picking.Lib_Primavera
         private Connection _connection;
 
         public ErpBS Engine { get { return _engine;  } }
+
+        #endregion
     }
 }
