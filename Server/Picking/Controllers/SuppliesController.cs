@@ -25,6 +25,6 @@ namespace Picking.Controllers
             return supply;
         }
 
-        private readonly Company _company = new Company(Company.COMPANY);
+        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

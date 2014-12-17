@@ -19,6 +19,6 @@ namespace Picking.Controllers
             return _company.GetStorageLocation(id);
         }
 
-        private readonly Company _company = new Company(Company.COMPANY);
+        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -180,9 +181,9 @@ namespace Picking.Controllers
                 if (!match.Success)
                     return null;
 
-                int a = int.Parse(match.Groups[1].ToString());
-                int c = int.Parse(match.Groups[2].ToString());
-                int s = int.Parse(match.Groups[3].ToString());
+                int a = int.Parse(match.Groups[1].ToString(), CultureInfo.InvariantCulture);
+                int c = int.Parse(match.Groups[2].ToString(), CultureInfo.InvariantCulture);
+                int s = int.Parse(match.Groups[3].ToString(), CultureInfo.InvariantCulture);
 
                 return new Location(a, c, s);
             }
@@ -216,6 +217,6 @@ namespace Picking.Controllers
             return _company.ListItemStock().Where(stock => stock.Item == itemId);
         }
 
-        private readonly Company _company = new Company(Company.COMPANY);
+        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

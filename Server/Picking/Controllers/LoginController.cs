@@ -22,6 +22,6 @@ namespace Picking.Controllers
             throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized));
         }
 
-        private readonly Company _company = new Company(Company.COMPANY);
+        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

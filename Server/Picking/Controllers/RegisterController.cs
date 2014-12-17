@@ -20,6 +20,6 @@ namespace Picking.Controllers
             return Convert.ToBase64String(tokenContents);
         }
 
-        private readonly Company _company = new Company(Company.COMPANY);
+        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

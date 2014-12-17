@@ -16,14 +16,14 @@ namespace Picking.Lib_Primavera
 
         #region Initialization
 
-        public static string COMPANY = "PRIMADELL";
+        public const string TargetCompany = "PRIMADELL";
 
         public Company(string name, string user = "", string password = "")
         {
             _name = name;
             if (!Initialize(user, password))
             {
-                throw new Exception("Could not intialize company " + name);
+                throw new InvalidOperationException("Could not initialize company " + name);
             }
         }
 
@@ -165,7 +165,7 @@ namespace Picking.Lib_Primavera
             };
         }
 
-        public List<Item> ListItems()
+        public IEnumerable<Item> ListItems()
         {
             EnsureInitialized();
 
@@ -185,7 +185,7 @@ namespace Picking.Lib_Primavera
             return result;
         }
 
-        public List<ItemStock> ListItemStock()
+        public IEnumerable<ItemStock> ListItemStock()
         {
             EnsureInitialized();
 
@@ -231,7 +231,7 @@ namespace Picking.Lib_Primavera
             };
         }
 
-        public List<string> ListStorageFacilities()
+        public IEnumerable<string> ListStorageFacilities()
         {
             EnsureInitialized();
 
@@ -246,7 +246,7 @@ namespace Picking.Lib_Primavera
             return result;
         }
 
-        public List<StorageLocation> ListStorageLocations()
+        public IEnumerable<StorageLocation> ListStorageLocations()
         {
             EnsureInitialized();
 
@@ -273,7 +273,7 @@ namespace Picking.Lib_Primavera
 
         #region Orders
 
-        public List<Order> ListOrders()
+        public IEnumerable<Order> ListOrders()
         {
             EnsureInitialized();
 
@@ -333,14 +333,14 @@ namespace Picking.Lib_Primavera
             return listDv;
         }
 
-        public Order GetOrder(int numdoc)
+        public Order GetOrder(int id)
         {
             EnsureInitialized();
 
             var objListCab =
                 _engine.Consulta(
                     "SELECT id, Entidade, Data, NumDoc, TotalMerc, Serie From CabecDoc where TipoDoc='ECL' and NumDoc='" +
-                    numdoc + "'");
+                    id + "'");
 
             var dv = new Order
             {
@@ -391,7 +391,7 @@ namespace Picking.Lib_Primavera
 
         #region Supplies
 
-        public List<Supply> ListSupplies()
+        public IEnumerable<Supply> ListSupplies()
         {
             EnsureInitialized();
 
@@ -451,12 +451,12 @@ namespace Picking.Lib_Primavera
             return listDv;
         }
 
-        public Supply GetSupply(int numDoc)
+        public Supply GetSupply(int id)
         {
             EnsureInitialized();
 
             var objListCab =
-                _engine.Consulta("SELECT Id, Entidade, Fornecedores.Nome as EntidadeNome, DataDoc, NumDoc, TotalMerc, Serie FROM CabecCompras INNER JOIN Fornecedores ON Fornecedores.Fornecedor = CabecCompras.Entidade where TipoDoc='ECF' AND NumDoc='" + numDoc + "'");
+                _engine.Consulta("SELECT Id, Entidade, Fornecedores.Nome as EntidadeNome, DataDoc, NumDoc, TotalMerc, Serie FROM CabecCompras INNER JOIN Fornecedores ON Fornecedores.Fornecedor = CabecCompras.Entidade where TipoDoc='ECF' AND NumDoc='" + id + "'");
 
             if (objListCab.Vazia())
                 return null;
@@ -512,7 +512,12 @@ namespace Picking.Lib_Primavera
 
         #region Picking
 
-        public void MarkOrderLinePicked(string orderLineId, bool picked = true)
+        public void MarkOrderLinePicked(string orderLineId)
+        {
+            MarkOrderLinePicked(orderLineId, true);
+        }
+
+        public void MarkOrderLinePicked(string orderLineId, bool picked)
         {
             ExecuteQuery("UPDATE LinhasDoc SET CDU_Picked = {0} WHERE Id = '{1}'", picked ? 1 : 0, orderLineId);
 
@@ -531,7 +536,7 @@ namespace Picking.Lib_Primavera
             ExecuteQuery("UPDATE LinhasDoc SET CDU_PickedQuantity = {0} WHERE Id = '{1}'", quantity, orderLineId);
         }
 
-        public List<PickingList> ListPickingLists()
+        public IEnumerable<PickingList> ListPickingLists()
         {
             EnsureInitialized();
 
@@ -653,7 +658,7 @@ namespace Picking.Lib_Primavera
 
         #region Putaway
 
-        public List<PutawayList> ListPutawayLists()
+        public IEnumerable<PutawayList> ListPutawayLists()
         {
             EnsureInitialized();
 
@@ -756,7 +761,7 @@ namespace Picking.Lib_Primavera
         private void EnsureInitialized()
         {
             if (!_initialized)
-                throw new Exception("Company not initialized!");
+                throw new InvalidOperationException("Company not initialized!");
         }
 
         private static string ExtractFacility(string location)
@@ -771,9 +776,9 @@ namespace Picking.Lib_Primavera
             return string.Empty;
         }
 
-        public int ExecuteQuery(string query, params object[] objs)
+        public int ExecuteQuery(string query, params object[] values)
         {
-            return ExecuteQuery(string.Format(query, objs));
+            return ExecuteQuery(string.Format(query, values));
         }
 
         public int ExecuteQuery(string query)
@@ -800,7 +805,6 @@ namespace Picking.Lib_Primavera
         public bool Login(string username, string password)
         {
             var passwordHash = _platform.Criptografia.Encripta(password, 50);
-
 
             var list = _engine.Consulta(String.Format("SELECT * FROM TDU_Pickers WHERE CDU_username = '{0}' AND CDU_passwordHash LIKE '{1}'", username, passwordHash));
             return list.NumLinhas() > 0;

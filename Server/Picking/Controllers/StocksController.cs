@@ -23,6 +23,6 @@ namespace Picking.Controllers
             }
         }
 
-        private readonly Company _company = new Company(Company.COMPANY);
+        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

@@ -10,7 +10,8 @@ using Picking.Lib_Primavera;
 
 namespace Picking.Controllers
 {
-    public class BasicAuthenticationAttribute : ActionFilterAttribute
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class BasicAuthenticationAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
@@ -38,6 +39,6 @@ namespace Picking.Controllers
             }
         }
 
-        private readonly Company _company = new Company(Company.COMPANY);
+        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

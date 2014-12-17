@@ -19,7 +19,7 @@ namespace Picking.Lib_Primavera.Model
 
         public string Serie { get; set; }
 
-        public List<SupplyLine> SupplyLines { get; set; }
+        public IEnumerable<SupplyLine> SupplyLines { get; set; }
     }
 
     public class SupplyLine
