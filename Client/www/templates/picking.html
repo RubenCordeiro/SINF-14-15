@@ -12,24 +12,39 @@
                 </select>
             </div>
             <ion-item class="item-divider">Pending Orders</ion-item>
-            <ion-checkbox class="animate-repeat" ng-repeat="order in orders | filter:search" ng-model="order.checked"
-                          ng-checked="order.checked" ng-disabled="automatic">
-                <h2>Serie {{order.Serie}}, Nº {{order.NumDoc}}</h2>
-                <span class="item-note">
-                    {{order.TotalMerc | currency:"&euro;"}}<br>
-                    {{order.Processed}}% complete
-                </span>
-
-                <p>{{order.EntityName}} - {{order.Data | amCalendar}} <!--<small>({{order.Data | amDateFormat:'YYYY-MM-DD HH:mm'}})</small>--></p>
-            </ion-checkbox>
-            <label class="item item-input item-select">
-                <div class="input-label">
-                    Warehouse
-                </div>
-                <select ng-model="warehouse.name" ng-options="wh for wh in warehouses"></select>
-            </label>
-            <button ng-click="pickSelected()" ng-disabled="!anySelectedOrder()" class="button button-dark button-block">Pick Selected</button>
+            <div ng-repeat="order in orders | filter:search">
+                <ion-item class="item-icon-left item-icon-right" ng-model="order.checked"
+                          ng-checked="order.checked" ng-disabled="automatic"
+                          ng-class="{active: isOrderShown(order)}">
+                    <i ng-click="order.checked = !order.checked" class="icon" ng-class="order.checked ? 'ion-ios-circle-filled' : 'ion-ios-circle-outline'"></i>
+                    <span ng-click="order.checked = !order.checked">Serie {{order.Serie}}, Nº {{order.NumDoc}}</span>
+                    <span><small><br>{{order.EntityName}} - {{order.Data | amCalendar}}</small></span>
+                    <span class="item-note" ng-click="toggleOrder(order)">
+                        {{order.TotalMerc | currency:"&euro;"}}<br>
+                        {{order.Processed}}% complete
+                    </span>
+                    <i ng-click="toggleOrder(order)" class="icon" ng-class="isOrderShown(order) ? 'ion-ios-minus-empty' : 'ion-ios-plus-empty'"></i>
+                </ion-item>
+                <ion-item class="item-accordion item-stable"
+                          ng-repeat="orderLine in order.OrderLines"
+                          ng-show="isOrderShown(order)">
+                    {{orderLine.ItemId}} (<small>{{orderLine.ItemDescription}}</small>) - {{orderLine.Quantity}} {{orderLine.Unit}}
+                </ion-item>
+            </div>
         </ion-list>
+
+        <div class="row">
+            <div class="col-33">
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Warehouse
+                    </div>
+                    <select ng-model="warehouse.name" ng-options="wh for wh in warehouses"></select>
+                </label>
+            </div>
+            <div class="col" style="padding-top: 0"><button style="margin-top: 0" ng-click="pickSelected()" ng-disabled="!anySelectedOrder()" class="button button-dark button-block">Pick Selected</button>
+            </div>
+        </div>
     </ion-content>
     <div class="bar bar-footer">
         <button class="button icon ion-information-circled pull-right" ng-click="showHelp()"></button>

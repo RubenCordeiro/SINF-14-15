@@ -162,6 +162,18 @@ angular.module('sinfApp.controllers', [])
             pickingListService.set(checkedOrdersIds, $scope.warehouse.name);
             $state.go('app.pickingResult');
         };
+
+        $scope.toggleOrder = function(Order) {
+            if ($scope.isOrderShown(Order)) {
+                $scope.shownOrder = null;
+            } else {
+                $scope.shownOrder = Order;
+            }
+        };
+
+        $scope.isOrderShown = function(Order) {
+            return $scope.shownOrder === Order;
+        };
     })
 
     .controller('PickingResultCtrl', function ($scope, $state, $stateParams, pickingListService, Restangular, $ionicLoading, $ionicPopup) {
