@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using System.Web.Http;
+using Picking.Lib_Primavera;
 
 namespace Picking.Controllers
 {
@@ -7,5 +8,7 @@ namespace Picking.Controllers
     public class AuthorizedApiController : ApiController
     {
         public string AuthorizedUser { get { return ((ApiIdentity)HttpContext.Current.User.Identity).Name; } }
+
+        private readonly Company _company = new Company(Company.COMPANY);
     }
 }

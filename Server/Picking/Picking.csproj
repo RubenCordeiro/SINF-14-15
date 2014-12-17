@@ -103,6 +103,7 @@
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
@@ -130,9 +131,11 @@
     <Compile Include="Controllers\DebugController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
     <Compile Include="Controllers\LocationsController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\PutawayListsController.cs" />
     <Compile Include="Controllers\PickingListsController.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\StocksController.cs" />
     <Compile Include="Controllers\StorageFacilitiesController.cs" />
     <Compile Include="Controllers\SuppliesController.cs" />
@@ -151,6 +154,7 @@
     <Compile Include="Lib_Primavera\Model\PickingList.cs" />
     <Compile Include="Lib_Primavera\Model\StorageLocation.cs" />
     <Compile Include="Lib_Primavera\Model\Supply.cs" />
+    <Compile Include="Lib_Primavera\Model\UserPassword.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +169,7 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <None Include="Properties\PublishProfiles\Picking.pubxml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

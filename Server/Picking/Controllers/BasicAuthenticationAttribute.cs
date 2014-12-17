@@ -6,6 +6,7 @@ using System.Text;
 using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using Picking.Lib_Primavera;
 
 namespace Picking.Controllers
 {
@@ -25,9 +26,9 @@ namespace Picking.Controllers
                 var username = decodedToken.Substring(0, decodedToken.IndexOf(":", StringComparison.Ordinal));
                 var password = decodedToken.Substring(decodedToken.IndexOf(":", StringComparison.Ordinal) + 1);
 
-                if (username == "user" && password == "user")
+                if (_company.Login(username, password))
                 {
-                    HttpContext.Current.User = new GenericPrincipal(new ApiIdentity(username), new string[] {});
+                    HttpContext.Current.User = new GenericPrincipal(new ApiIdentity(username), new string[] { });
                     base.OnActionExecuting(actionContext);
                 }
                 else
@@ -36,5 +37,7 @@ namespace Picking.Controllers
                 }
             }
         }
+
+        private readonly Company _company = new Company(Company.COMPANY);
     }
 }

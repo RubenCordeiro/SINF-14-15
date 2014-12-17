@@ -74,6 +74,7 @@ namespace Picking.Lib_Primavera
 
         #endregion
 
+        
         #region Document Generation
 
         public string GenerateStockRemovalDocument(PickingItem item, double quantity)
@@ -795,5 +796,22 @@ namespace Picking.Lib_Primavera
         public ErpBS Engine { get { return _engine;  } }
 
         #endregion
+
+        public bool Login(string username, string password)
+        {
+            var passwordHash = _platform.Criptografia.Encripta(password, 50);
+
+
+            var list = _engine.Consulta(String.Format("SELECT * FROM TDU_Pickers WHERE CDU_username = '{0}' AND CDU_passwordHash LIKE '{1}'", username, passwordHash));
+            return list.NumLinhas() > 0;
+        }
+
+        public bool Register(string username, string password)
+        {
+            var passwordHash = _platform.Criptografia.Encripta(password, 50);
+
+            var noChanges = ExecuteQuery(String.Format("INSERT INTO TDU_Pickers (CDU_username, CDU_passwordHash) VALUES ('{0}', '{1}')", username, passwordHash));
+            return noChanges > 0;
+        }
     }
 }

@@ -26,7 +26,7 @@ angular.module('sinfApp.controllers', [])
             console.log('Doing login', $scope.loginData);
 
             Restangular.all('login').post($scope.loginData).then(function (data) {
-                AuthService.login($scope.loginData.username, date);
+                AuthService.login($scope.loginData.username, data);
                 $scope.closeLogin();
             }, function (response) {
                 AlertPopupService.createPopup("Error", response.data.error);
@@ -49,7 +49,7 @@ angular.module('sinfApp.controllers', [])
         $scope.setPickedq0 = function() { execute('reset_pickedq'); }
         $scope.setPickedq1 = function() { execute('set_pickedq'); }
         $scope.register = function () {
-            Restangular.all('register').post({ loginInfo : { username: 'user', password: '123456' }}).then(function (data) {
+            Restangular.all('register').post({ username: 'user', password: '123456' }).then(function (data) {
                 $ionicPopup.alert({
                     template: JSON.stringify(data)
                 });
