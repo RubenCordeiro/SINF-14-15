@@ -80,6 +80,26 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
                 }
             })
 
+            .state('app.putawayLists', {
+                url: '/putawayLists',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/putawayLists.html',
+                        controller: 'PutawayListsCtrl'
+                    }
+                }
+            })
+
+            .state('app.putawayList', {
+                url: '/putawayLists/:id',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/putawayList.html',
+                        controller: 'PutawayListCtrl'
+                    }
+                }
+            })
+
             .state('app.putaway', {
                 url: '/putaway',
                 views: {
@@ -103,7 +123,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         // if none of the above states are matched, use this as the fallback
         $urlRouterProvider.otherwise('/app/home');
 
-        RestangularProvider.setBaseUrl("http://localhost/Picking/api");
+        RestangularProvider.setBaseUrl("http://192.168.108.189/Picking/api");
     })
 
     .service('pickingListService', function () {

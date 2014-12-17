@@ -654,12 +654,98 @@ namespace Picking.Lib_Primavera
 
         public List<PutawayList> ListPutawayLists()
         {
-            return new List<PutawayList>();
+            EnsureInitialized();
+
+            var objListCab = _engine.Consulta("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PutawayList");
+
+            var putawayLists = new List<PutawayList>();
+
+            for (; !objListCab.NoFim(); objListCab.Seguinte())
+            {
+                var putawayList = new PutawayList
+                {
+                    Id = objListCab.Valor("CDU_id"),
+                    Date = objListCab.Valor("CDU_date"),
+                    PickerName = objListCab.Valor("CDU_pickerName")
+                };
+
+                var putawayItems = new List<PutawayItem>();
+                var objListLin = _engine.Consulta(
+                    string.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id",
+                    putawayList.Id));
+
+                for (; !objListLin.NoFim(); objListLin.Seguinte())
+                {
+                    var putawayItem = new PutawayItem
+                    {
+                        Item = new Item
+                        {
+                            Id = objListLin.Valor("CDU_itemId")
+                        },
+                        StorageLocation = objListLin.Valor("CDU_storageLocation"),
+                        Quantity = objListLin.Valor("CDU_quantity"),
+                        Unit = objListLin.Valor("CDU_unit")
+                    };
+
+                    putawayItem.StorageFacility = ExtractFacility(putawayItem.StorageLocation);
+                    putawayItem.PutawayQuantity = putawayItem.Quantity;
+
+                    putawayItems.Add(putawayItem);
+                }
+
+                putawayList.Items = putawayItems;
+                putawayList.SkippedSupplies = new List<SupplyLine>();
+                putawayLists.Add(putawayList);
+            }
+
+            return putawayLists;
         }
 
         public PutawayList GetPutawayList(int id)
         {
-            return new PutawayList();
+            EnsureInitialized();
+
+            var objListCab =
+                _engine.Consulta(
+                    string.Format("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PutawayList WHERE CDU_id={0}", id));
+
+            if (objListCab.Vazia())
+                return null;
+
+            var putawayList = new PutawayList
+            {
+                Id = objListCab.Valor("CDU_id"),
+                Date = objListCab.Valor("CDU_date"),
+                PickerName = objListCab.Valor("CDU_pickerName")
+            };
+
+            var putawayItems = new List<PutawayItem>();
+            var objListLin = _engine.Consulta(
+                string.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id", putawayList.Id));
+
+            for (; !objListLin.NoFim(); objListLin.Seguinte())
+            {
+                var putawayItem = new PutawayItem
+                {
+                    Item = new Item
+                    {
+                        Id = objListLin.Valor("CDU_itemId")
+                    },
+                    StorageLocation = objListLin.Valor("CDU_storageLocation"),
+                    Quantity = objListLin.Valor("CDU_quantity"),
+                    Unit = objListLin.Valor("CDU_unit")
+                };
+
+                putawayItem.StorageFacility = ExtractFacility(putawayItem.StorageLocation);
+                putawayItem.PutawayQuantity = putawayItem.Quantity;
+
+                putawayItems.Add(putawayItem);
+            }
+
+            putawayList.Items = putawayItems;
+            putawayList.SkippedSupplies = new List<SupplyLine>();
+
+            return putawayList;
         }
 
         #endregion

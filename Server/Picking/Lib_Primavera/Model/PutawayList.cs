@@ -13,6 +13,6 @@ namespace Picking.Lib_Primavera.Model
 
         public IEnumerable<PutawayItem> Items { get; set; }
 
-        public IEnumerable<SupplyLine> SkippedOrders { get; set; } 
+        public IEnumerable<SupplyLine> SkippedSupplies { get; set; } 
     }
 }

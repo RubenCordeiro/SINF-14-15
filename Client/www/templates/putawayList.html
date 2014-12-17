@@ -1,14 +1,14 @@
-<ion-view view-title="Picking List {{id}}" ng-init="init()">
+<ion-view view-title="Putaway List {{id}}" ng-init="init()">
     <ion-content padding="true" class="has-header">
         <div class="list card card">
 
             <div class="item item-divider">
-                Id {{pickingList.Id}}
+                Id {{putawayList.Id}}
             </div>
             <div class="item item-text-wrap">
-                <p>{{pickingList.Items.length}} items in {{pickingList.Items[0].StorageFacility}}</p>
-                <p><strong>Picker: </strong> {{pickingList.PickerName}}</p>
-                <p><strong>Date: </strong> {{pickingList.Date | amCalendar}} <small>({{pickingList.Date | amDateFormat:'YYYY-MM-DD HH:mm'}})</small></p>
+                <p>{{putawayList.Items.length}} items in {{putawayList.Items[0].StorageFacility}}</p>
+                <p><strong>Picker: </strong> {{putawayList.PickerName}}</p>
+                <p><strong>Date: </strong> {{putawayList.Date | amCalendar}} <small>({{putawayList.Date | amDateFormat:'YYYY-MM-DD HH:mm'}})</small></p>
             </div>
 
             <div class="item item-body">
@@ -20,7 +20,7 @@
                             <div class="col">Location</div>
                         </div>
                     </ion-item>
-                    <ion-item class="animate-repeat" ng-repeat="item in pickingList.Items">
+                    <ion-item class="animate-repeat" ng-repeat="item in putawayList.Items">
                         <div class="row">
                             <div class="col">{{item.Item.Id}}</div>
                             <div class="col">{{item.Quantity}} {{item.Unit}}</div>

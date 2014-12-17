@@ -249,6 +249,48 @@ angular.module('sinfApp.controllers', [])
         };
     })
 
+    .controller('PutawayListsCtrl', function ($scope, Restangular, $ionicPopup, $ionicLoading) {
+        $scope.init = function () {
+
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
+            Restangular.all('putawaylists').getList().then(function (data) {
+                $scope.putawayLists = data;
+                $ionicLoading.hide();
+            }, function (err) {
+                $ionicLoading.hide();
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: '<p>An error ocurred: ' + JSON.stringify(err) + '</p>'
+                });
+            });
+        };
+    })
+
+    .controller('PutawayListCtrl', function ($scope, $stateParams, Restangular, $ionicPopup, $ionicLoading) {
+        $scope.id = $stateParams.id;
+
+        $scope.init = function () {
+
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
+            Restangular.one('putawaylists', $stateParams.id).get().then(function (data) {
+                $scope.putawayList = data;
+                $ionicLoading.hide();
+            }, function (err) {
+                $ionicLoading.hide();
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: '<p>An error ocurred: ' + JSON.stringify(err) + '</p>'
+                });
+            });
+        };
+    })
+
     .controller('PutawayCtrl', function ($scope, $state, $ionicPopup, Restangular, putawayListService, $ionicLoading) {
         $scope.supplies = [];
         $scope.warehouses = [];
