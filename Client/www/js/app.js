@@ -218,14 +218,16 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
     .service('pickingListService', function () {
         var orders = [];
         var facility = '';
+        var capacity = 0.0;
 
-        this.set = function(o, f) {
+        this.set = function(o, f, c) {
             orders = o;
             facility = f;
+            capacity = c;
         };
 
         this.get = function() {
-            return { Orders: orders, Facility: facility };
+            return { Orders: orders, Facility: facility, AvailableCapacity: capacity };
         };
     })
 

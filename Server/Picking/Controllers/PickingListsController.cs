@@ -15,7 +15,7 @@ namespace Picking.Controllers
         public PickingList Post(PickingSelection selection)
         {
             var pickingItems = new List<PickingItem>();
-            var skippedOrders = new List<OrderLine>();
+            var orderLines = new List<OrderLine>();
 
             foreach (var orderId in selection.Orders)
             {
@@ -39,6 +39,8 @@ namespace Picking.Controllers
                     if (Math.Abs(orderLine.PickedQuantity - orderLine.Quantity) < Double.Epsilon * 100)
                         continue;
 
+                    orderLines.Add(orderLine);
+
                     var stock = GetStock(orderLine.Item.Id)
                         .Where(itemStock => itemStock.Stock > 0 && itemStock.StorageFacility == selection.Facility)
                         .OrderByDescending(itemStock => itemStock.Stock) // Prioritize by stock quantity
@@ -46,13 +48,10 @@ namespace Picking.Controllers
                         .ToList();
 
                     if (stock.Sum(itemStock => itemStock.Stock) < orderLine.Quantity)
-                    {
-                        skippedOrders.Add(orderLine);
                         continue;
-                    }
 
                     ItemStock previousStockLocation = null;
-                    while (orderLine.Quantity > 0)
+                    while (orderLine.Quantity > 0 && selection.AvailableCapacity > 0)
                     {
                         var stockLocation = previousStockLocation == null ? stock[0] : Company.GetClosestLocation(stock, previousStockLocation);
                         previousStockLocation = stockLocation;
@@ -86,11 +85,18 @@ namespace Picking.Controllers
                             StorageLocation = stockLocation.StorageLocation,
                         };
 
+                        selection.AvailableCapacity -= pickingItem.Item.Volume * pickingItem.Quantity;
+                        if (selection.AvailableCapacity < 0)
+                            continue;
+
                         pickingItems.Add(pickingItem);
                         _company.MarkOrderLinePicked(orderLine.Id);
                     }
                 }
             }
+
+            var skippedOrders = orderLines.Where(orderLine =>
+                pickingItems.All(item => item.OrderLineId != orderLine.Id));
 
             return new PickingList {Items = pickingItems, SkippedOrders = skippedOrders};
         }

@@ -33,12 +33,25 @@
             </div>
         </ion-list>
 
-        <label class="item item-input item-select">
-            <div class="input-label">
-                Warehouse
-            </div>
-            <select ng-model="warehouse.name" ng-options="wh for wh in warehouses"></select>
-        </label>
+        <div class="list">
+            <label class="item item-input item-select">
+                <div class="input-label">
+                    Warehouse
+                </div>
+                <select ng-model="selection.warehouse" ng-options="wh for wh in warehouses"></select>
+            </label>
+            <label class="item item-input item-select">
+                <span class="input-label">
+                    Capacity
+                </span>
+                <select ng-model="selection.capacity">
+                    <option value="5">Container A (5 m&#179;)</option>
+                    <option value="10">Container B (10 m&#179;)</option>
+                    <option value="50">Container C (50 m&#179;)</option>
+                    <option value="100">Container D (100 m&#179;)</option>
+                </select>
+            </label>
+        </div>
         <button ng-click="pickSelected()" ng-disabled="!anySelectedOrder()" class="button button-dark button-block">Pick Selected</button>
     </ion-content>
 </ion-view>

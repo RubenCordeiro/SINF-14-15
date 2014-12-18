@@ -86,8 +86,9 @@ angular.module('sinfApp.controllers', [])
     .controller('PickingCtrl', function ($scope, $state, $ionicPopup, Restangular, pickingListService, $ionicLoading) {
         $scope.orders = [];
         $scope.warehouses = [];
-        $scope.warehouse = {
-            name: ''
+        $scope.selection = {
+            warehouse: '',
+            capacity: 0.0
         };
 
         $scope.init = function () {
@@ -99,7 +100,7 @@ angular.module('sinfApp.controllers', [])
             Restangular.all('storagefacilities').getList().then(function (data) {
                 $scope.warehouses = data;
                 if ($scope.warehouses.length > 0) {
-                    $scope.warehouse.name = $scope.warehouses[0];
+                    $scope.selection.warehouse = $scope.warehouses[0];
                 }
 
                 $ionicLoading.hide();
@@ -109,7 +110,6 @@ angular.module('sinfApp.controllers', [])
 
             Restangular.all('orders').getList().then(function (data) {
                 $scope.orders = data;
-
 
                 _.each($scope.orders, function(order) {
                     var numProcessed = _.filter(order.OrderLines, function(orderline) {
@@ -143,7 +143,7 @@ angular.module('sinfApp.controllers', [])
 
             var checkedOrdersIds = _.pluck(checkedOrders, 'NumDoc');
 
-            pickingListService.set(checkedOrdersIds, $scope.warehouse.name);
+            pickingListService.set(checkedOrdersIds, $scope.selection.warehouse, $scope.selection.capacity);
             $state.go('app.pickingResult');
         };
 
