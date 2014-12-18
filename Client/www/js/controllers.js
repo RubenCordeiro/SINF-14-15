@@ -117,7 +117,7 @@ angular.module('sinfApp.controllers', [])
         $scope.warehouses = [];
         $scope.selection = {
             warehouse: '',
-            capacity: 0.0
+            capacity: 5
         };
 
         $scope.init = function () {
@@ -206,7 +206,6 @@ angular.module('sinfApp.controllers', [])
                     $scope.items = data.Items;
 
                     for (var i = 0; i < $scope.items.length; ++i) {
-                        $scope.items[i].disabled = i != 0;
                         $scope.items[i].PickedQuantity = $scope.items[i].Quantity + " " + $scope.items[i].Unit;
                     }
                 } else {
