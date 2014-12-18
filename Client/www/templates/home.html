@@ -22,29 +22,35 @@
             <div class="item item-divider">Debug (development only)</div>
             <div class="item item-body">
                 <div class="list">
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPicked0()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('reset_picked')">
                         <i class="icon ion-bug"></i>Set Picked = 0<i class="icon ion-arrow-return-right"></i>
                     </a>
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPicked1()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('set_picked')">
                         <i class="icon ion-bug"></i>Set Picked = 1<i class="icon ion-arrow-return-right"></i>
                     </a>
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPickedq0()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('reset_pickedq')">
                         <i class="icon ion-bug"></i>Set PickedQuantity = 0<i class="icon ion-arrow-return-right"></i>
                     </a>
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPickedq1()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('set_pickedq')">
                         <i class="icon ion-bug"></i>Set PickedQuantity = all<i class="icon ion-arrow-return-right"></i>
                     </a>
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPutaway0()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('reset_putaway')">
                         <i class="icon ion-bug"></i>Set Putaway = 0<i class="icon ion-arrow-return-right"></i>
                     </a>
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPutaway1()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('set_putaway')">
                         <i class="icon ion-bug"></i>Set Putaway = 1<i class="icon ion-arrow-return-right"></i>
                     </a>
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPutawayq0()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('reset_putawayq')">
                         <i class="icon ion-bug"></i>Set PutawayQuantity = 0<i class="icon ion-arrow-return-right"></i>
                     </a>
-                    <a class="item item-stable item-icon-left item-icon-right" ng-click="setPutawayq1()">
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('set_putawayq')">
                         <i class="icon ion-bug"></i>Set PutawayQuantity = all<i class="icon ion-arrow-return-right"></i>
+                    </a>
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('returns_401')">
+                        <i class="icon ion-bug"></i>Returns 401<i class="icon ion-arrow-return-right"></i>
+                    </a>
+                    <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('returns_404')">
+                        <i class="icon ion-bug"></i>Returns 404<i class="icon ion-arrow-return-right"></i>
                     </a>
                     <div class="row">
                         <div class="col">

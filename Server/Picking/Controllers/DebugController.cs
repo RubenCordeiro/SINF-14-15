@@ -1,4 +1,6 @@
-﻿using System.Web.Http;
+﻿using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using Picking.Lib_Primavera;
 
 namespace Picking.Controllers
@@ -26,6 +28,10 @@ namespace Picking.Controllers
                     return _company.ExecuteQuery("UPDATE LinhasCompras SET CDU_PutawayQuantity = 0").ToString();
                 case "set_putawayq":
                     return _company.ExecuteQuery("UPDATE LinhasCompras SET CDU_PutawayQuantity = Quantidade").ToString();
+                case "returns_401":
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized));
+                case "returns_404":
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                 default:
                     return "Action " + action + " not handled.";
             }

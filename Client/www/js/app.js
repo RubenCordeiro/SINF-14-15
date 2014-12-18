@@ -68,7 +68,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         }
     }])
 
-    .run(function ($ionicPlatform) {
+    .run(function ($ionicPlatform, $state, Restangular) {
         $ionicPlatform.ready(function () {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
             // for form inputs)
@@ -79,6 +79,15 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
                 // org.apache.cordova.statusbar required
                 StatusBar.styleDefault();
             }
+        });
+
+        Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
+            if(response.status === 401) {
+                $state.go('app.login');
+                return false; // error handled
+            }
+
+            return true; // error not handled
         });
     })
 

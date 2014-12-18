@@ -23,22 +23,13 @@ angular.module('sinfApp.controllers', [])
 
     .controller('HomeCtrl', function ($scope, Restangular, $ionicPopup) {
 
-        function execute(action) {
+        $scope.executeDebug = function(action) {
             Restangular.one('debug').get({ action: action }).then(function (data) {
                 $ionicPopup.alert({
                     template: JSON.stringify(data)
                 });
             });
         }
-
-        $scope.setPicked0 =  function() { execute('reset_picked'); };
-        $scope.setPicked1 =  function() { execute('set_picked'); };
-        $scope.setPickedq0 = function() { execute('reset_pickedq'); };
-        $scope.setPickedq1 = function() { execute('set_pickedq'); };
-        $scope.setPutaway0 =  function() { execute('reset_putaway'); };
-        $scope.setPutaway1 =  function() { execute('set_putaway'); };
-        $scope.setPutawayq0 = function() { execute('reset_putawayq'); };
-        $scope.setPutawayq1 = function() { execute('set_putawayq'); };
 
         $scope.reg = { user: '', pass: '' };
         $scope.register = function () {
