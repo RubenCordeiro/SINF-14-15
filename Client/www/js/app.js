@@ -9,10 +9,13 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
     // singleton, this service can be injected into any route in order to check the current user session information
     .provider('AuthService', function AuthServiceProvider() {
 
-        var currentUser;
+        var currentUser = {
+            username: '',
+            access_token: ''
+        };
 
         function token() {
-            if (currentUser && currentUser.access_token)
+            if (currentUser.username && currentUser.access_token)
                 return currentUser.access_token;
             else
                 return null;
@@ -24,11 +27,12 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
 
             this.storage = $cookieStore;
 
-            this.login = function (user, access_token) {
-                if (user && access_token) {
-                    currentUser = user;
+            this.login = function (username, access_token) {
+                if (username && access_token) {
+                    currentUser.username = username;
                     currentUser.access_token = access_token;
-                    this.storage.put('user', user);
+                    console.log('currentUser', currentUser);
+                    this.storage.put('user', username);
                     this.storage.put('token', access_token);
                 }
             };
@@ -210,7 +214,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
 
         RestangularProvider.addFullRequestInterceptor(function (element, operation, what, url, headers) {
             return {
-                headers: _.extend(headers, {'Authorization': AuthServiceProvider.token()})
+                headers: _.extend(headers, {'Authorization': 'Basic ' + AuthServiceProvider.token()})
             }
         });
     })

@@ -41,6 +41,23 @@ angular.module('sinfApp.controllers', [])
         }
     })
 
+    .controller('LoginCtrl', function($scope, Restangular, AuthService, AlertPopupService, $state) {
+
+        $scope.loginData = {};
+
+        $scope.login = function() {
+            console.log('Doing login', $scope.loginData);
+
+            Restangular.all('login').post($scope.loginData).then(function (data) {
+                console.log(data);
+                AuthService.login($scope.loginData.Username, data);
+                $state.go('app.home');
+            }, function (response) {
+                AlertPopupService.createPopup("Error", response.data.error);
+            });
+        };
+    })
+
     .controller('PickingListsCtrl', function ($scope, Restangular, $ionicPopup, $ionicLoading) {
         $scope.init = function () {
 
@@ -157,22 +174,6 @@ angular.module('sinfApp.controllers', [])
 
         $scope.isOrderShown = function(Order) {
             return $scope.shownOrder === Order;
-        };
-    })
-
-    .controller('LoginCtrl', function($scope, Restangular, AuthService, AlertPopupService, $state) {
-
-        $scope.loginData = {};
-
-        $scope.login = function() {
-            console.log('Doing login', $scope.loginData);
-
-            Restangular.all('login').post($scope.loginData).then(function (data) {
-                AuthService.login($scope.loginData.Username, data);
-                $state.go('app.home');
-            }, function (response) {
-                AlertPopupService.createPopup("Error", response.data.error);
-            });
         };
     })
 
