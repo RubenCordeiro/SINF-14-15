@@ -1,9 +1,3 @@
-// Ionic Starter App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.controllers' is found in controllers.js
 angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'restangular', 'ngCookies'])
 
     // singleton, this service can be injected into any route in order to check the current user session information
@@ -40,11 +34,12 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
             this.logout = function () {
                 this.storage.remove('user');
                 this.storage.remove('token');
-                currentUser = null;
+                currentUser.username = '';
+                currentUser.access_token = '';
             };
 
             this.isLoggedIn = function () {
-                return currentUser != null;
+                return currentUser.access_token;
             };
 
             this.currentUser = function () {
@@ -213,6 +208,9 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         RestangularProvider.setBaseUrl("http://192.168.1.73/Picking/api");
 
         RestangularProvider.addFullRequestInterceptor(function (element, operation, what, url, headers) {
+            if (!AuthServiceProvider.token())
+                return;
+
             return {
                 headers: _.extend(headers, {'Authorization': 'Basic ' + AuthServiceProvider.token()})
             }

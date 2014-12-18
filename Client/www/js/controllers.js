@@ -19,6 +19,13 @@ angular.module('sinfApp.controllers', [])
             $state.go('app.login');
         };
 
+        $scope.isLoggedIn = function () {
+            return AuthService.isLoggedIn();
+        };
+
+        $scope.logout = function () {
+            return AuthService.logout();
+        };
     })
 
     .controller('HomeCtrl', function ($scope, Restangular, $ionicPopup) {
