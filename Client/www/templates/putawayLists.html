@@ -5,7 +5,7 @@
                 Previous Putaway Lists
             </div>
             <ion-item ui-sref="app.putawayList({ id: putawayList.Id })" class="animate-repeat" ng-repeat="putawayList in putawayLists">
-                <h2>Id {{putawayList.Id}}</h2>
+                <h2>Id: {{putawayList.Id}}</h2>
                 <p>{{putawayList.Items.length}} items in {{putawayList.Items[0].StorageFacility}}</p>
                 <p>By <strong>{{putawayList.PickerName}}</strong>, {{putawayList.Date | amCalendar}}</p>
             </ion-item>

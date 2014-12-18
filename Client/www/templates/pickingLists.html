@@ -5,7 +5,7 @@
                 Previous Picking Lists
             </div>
             <ion-item ui-sref="app.pickingList({ id: pickingList.Id })" class="animate-repeat" ng-repeat="pickingList in pickingLists">
-                <h2>Id {{pickingList.Id}}</h2>
+                <h2>Id: {{pickingList.Id}}</h2>
                 <p>{{pickingList.Items.length}} items in {{pickingList.Items[0].StorageFacility}}</p>
                 <p>By <strong>{{pickingList.PickerName}}</strong>, {{pickingList.Date | amCalendar}}</p>
             </ion-item>
