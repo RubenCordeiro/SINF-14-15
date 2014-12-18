@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Http;
-using Picking.Lib_Primavera;
 using Picking.Lib_Primavera.Model;
 
 namespace Picking.Controllers
 {
-    public class LocationsController : ApiController
+    public class LocationsController : AuthorizedApiController
     {
         // GET /api/locations/
         public IEnumerable<StorageLocation> Get()
@@ -34,7 +32,5 @@ namespace Picking.Controllers
         //{
         //    return _company.GetStorageLocation(id);
         //}
-
-        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

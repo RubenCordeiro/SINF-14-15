@@ -7,7 +7,7 @@ using Picking.Lib_Primavera.Model;
 
 namespace Picking.Controllers
 {
-    public class ItemsController : ApiController
+    public class ItemsController : AuthorizedApiController
     {
         // GET /items/
         public IEnumerable<Item> Get()
@@ -25,7 +25,5 @@ namespace Picking.Controllers
 
             return artigo;
         }
-
-        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

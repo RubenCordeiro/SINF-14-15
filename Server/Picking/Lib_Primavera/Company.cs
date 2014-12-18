@@ -671,7 +671,7 @@ namespace Picking.Lib_Primavera
             return pickingList;
         }
 
-        public void InsertPickingItems(IEnumerable<PickingItem> items)
+        public void InsertPickingItems(IEnumerable<PickingItem> items, string pickerName)
         {
             var objListLin = _engine.Consulta(
                 "SELECT ISNULL(MAX(CDU_id), 0) as id FROM TDU_PickingList"
@@ -680,7 +680,7 @@ namespace Picking.Lib_Primavera
             var maxId = (int) objListLin.Valor("id");
 
             ExecuteQuery("INSERT INTO TDU_PickingList (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
-                maxId + 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.000"), "Zebino");
+                maxId + 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.000"), pickerName);
 
             var i = 0;
             foreach (var item in items)
@@ -808,7 +808,7 @@ namespace Picking.Lib_Primavera
             ExecuteQuery("UPDATE LinhasCompras SET CDU_Putaway = {0} WHERE Id = '{1}'", putaway ? 1 : 0, supplyLineId);
         }
 
-        public void InsertPutawayItems(IEnumerable<PutawayItem> items)
+        public void InsertPutawayItems(IEnumerable<PutawayItem> items, string pickerName)
         {
             var objListLin = _engine.Consulta(
                 "SELECT ISNULL(MAX(CDU_id), 0) as id FROM TDU_PutawayList"
@@ -817,7 +817,7 @@ namespace Picking.Lib_Primavera
             var maxId = (int)objListLin.Valor("id");
 
             ExecuteQuery("INSERT INTO TDU_PutawayList (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
-                maxId + 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.000"), "Zebino");
+                maxId + 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.000"), pickerName);
 
             var i = 0;
             foreach (var item in items)

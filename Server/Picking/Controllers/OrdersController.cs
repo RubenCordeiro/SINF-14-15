@@ -2,12 +2,11 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Picking.Lib_Primavera;
 using Picking.Lib_Primavera.Model;
 
 namespace Picking.Controllers
 {
-    public class OrdersController : ApiController
+    public class OrdersController : AuthorizedApiController
     {
         // GET /orders/
         public IEnumerable<Order> Get()
@@ -24,7 +23,5 @@ namespace Picking.Controllers
 
             return docvenda;
         }
-
-        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

@@ -9,7 +9,7 @@ using Picking.Lib_Primavera.Model;
 
 namespace Picking.Controllers
 {
-    public class PickingListsController : ApiController
+    public class PickingListsController : AuthorizedApiController
     {
         // POST /api/pickinglists/
         public PickingList Post(PickingSelection selection)
@@ -127,7 +127,7 @@ namespace Picking.Controllers
                 _company.SetOrderLinePickedQuantity(item.OrderLineId, item.PickedQuantity);
             }
 
-            _company.InsertPickingItems(itemsList);
+            _company.InsertPickingItems(itemsList, AuthorizedUser);
 
             var err2 = _company.GenerateStockTransferDocument(itemsList);
             if (!string.IsNullOrWhiteSpace(err2))
@@ -156,7 +156,5 @@ namespace Picking.Controllers
         {
             return _company.ListItemStock().Where(stock => stock.Item == itemId);
         }
-
-        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

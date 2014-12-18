@@ -9,7 +9,7 @@ using Picking.Lib_Primavera.Model;
 
 namespace Picking.Controllers
 {
-    public class PutawayListsController : ApiController
+    public class PutawayListsController : AuthorizedApiController
     {
         // POST /api/putawaylists
         public PutawayList Post(PutawaySelection selection)
@@ -125,7 +125,7 @@ namespace Picking.Controllers
             //    //_company.SetOrderLinePickedQuantity(item.OrderLineId, item.PickedQuantity);
             //}
 
-            _company.InsertPutawayItems(itemsList);
+            _company.InsertPutawayItems(itemsList, AuthorizedUser);
 
             var err2 = _company.GenerateStockTransferDocument(itemsList);
             if (!string.IsNullOrWhiteSpace(err2))
@@ -154,7 +154,5 @@ namespace Picking.Controllers
         {
             return _company.ListItemStock().Where(stock => stock.Item == itemId && LocationHelper.FromString(stock.StorageLocation) != null);
         }
-
-        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

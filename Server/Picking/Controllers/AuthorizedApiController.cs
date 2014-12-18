@@ -9,6 +9,6 @@ namespace Picking.Controllers
     {
         public string AuthorizedUser { get { return ((ApiIdentity)HttpContext.Current.User.Identity).Name; } }
 
-        private readonly Company _company = new Company(Company.TargetCompany);
+        protected readonly Company _company = new Company(Company.TargetCompany);
     }
 }

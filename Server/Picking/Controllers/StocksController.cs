@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Picking.Lib_Primavera;
 using Picking.Lib_Primavera.Model;
 
 namespace Picking.Controllers
 {
-    public class StocksController : ApiController
+    public class StocksController : AuthorizedApiController
     {
         // GET /api/stocks
         public IEnumerable<ItemStock> Get()
@@ -22,7 +21,5 @@ namespace Picking.Controllers
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message));
             }
         }
-
-        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }

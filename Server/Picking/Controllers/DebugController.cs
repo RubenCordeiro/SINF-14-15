@@ -5,7 +5,7 @@ using Picking.Lib_Primavera;
 
 namespace Picking.Controllers
 {
-    public class DebugController : ApiController
+    public class DebugController : AuthorizedApiController
     {
         // GET /api/debug/<action>
         public string Get(string action)
@@ -36,7 +36,5 @@ namespace Picking.Controllers
                     return "Action " + action + " not handled.";
             }
         }
-
-        private readonly Company _company = new Company(Company.TargetCompany);
     }
 }
