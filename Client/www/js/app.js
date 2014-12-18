@@ -25,7 +25,6 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
                 if (username && access_token) {
                     currentUser.username = username;
                     currentUser.access_token = access_token;
-                    console.log('currentUser', currentUser);
                     this.storage.put('user', username);
                     this.storage.put('token', access_token);
                 }

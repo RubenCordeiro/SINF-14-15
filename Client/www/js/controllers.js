@@ -57,10 +57,7 @@ angular.module('sinfApp.controllers', [])
         $scope.loginData = {};
 
         $scope.login = function() {
-            console.log('Doing login', $scope.loginData);
-
             Restangular.all('login').post($scope.loginData).then(function (data) {
-                console.log(data);
                 AuthService.login($scope.loginData.Username, data);
                 $state.go('app.home');
             }, function (response) {
@@ -424,7 +421,6 @@ angular.module('sinfApp.controllers', [])
 
             Restangular.all('putawaylists').patch({ Items: $scope.items, SkippedSupplies: $scope.skippedSupplies}).then(function (data) {
                 $ionicLoading.hide();
-                console.log(data);
                 $state.go('app.putaway');
             }, function (err) {
                 $ionicLoading.hide();
