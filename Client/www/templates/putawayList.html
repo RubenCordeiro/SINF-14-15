@@ -16,6 +16,7 @@
                     <ion-item class="item-divider">
                         <div class="row">
                             <div class="col">Item Id</div>
+                            <div class="col">Description</div>
                             <div class="col">Quantity</div>
                             <div class="col">Location</div>
                         </div>
@@ -23,6 +24,7 @@
                     <ion-item class="animate-repeat" ng-repeat="item in putawayList.Items">
                         <div class="row">
                             <div class="col">{{item.Item.Id}}</div>
+                            <div class="col item-text-wrap"><small>{{item.Item.Description}}</small></div>
                             <div class="col">{{item.Quantity}} {{item.Unit}}</div>
                             <div class="col">{{item.StorageLocation}}</div>
                         </div>
