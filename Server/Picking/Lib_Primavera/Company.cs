@@ -6,6 +6,7 @@ using Interop.ErpBS800;
 using Interop.GcpBE800;
 using Interop.StdBE800;
 using Interop.StdPlatBS800;
+using Picking.Controllers;
 using Picking.Lib_Primavera.Model;
 
 // ReSharper disable UseIndexedProperty
@@ -104,7 +105,44 @@ namespace Picking.Lib_Primavera
 
             doc.set_Linhas(lines);
 
-            var avisos = string.Empty;
+            var avisos = String.Empty;
+            Engine.Comercial.Stocks.Actualiza(doc, ref avisos);
+
+            return avisos;
+        }
+
+        public string GenerateStockTransferDocument(IList<PutawayItem> items)
+        {
+            var data = DateTime.Now;
+            var doc = new GcpBEDocumentoStock();
+
+            doc.set_Tipodoc("TRA");
+
+            Engine.Comercial.Stocks.PreencheDadosRelacionados(doc);
+
+            var facility = items[0].StorageFacility;
+            var facilityIn = facility + ".IN";
+
+            doc.set_ArmazemOrigem(facility);
+            doc.set_DataDoc(data);
+
+            var lines = new GcpBELinhasDocumentoStock();
+
+            foreach (var item in items)
+            {
+                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.Item.Id, Armazem: facility, Localizacao: item.StorageLocation, Quantidade: item.PutawayQuantity, TipoDocStock: "TRA");
+                for (var i = 1; i <= itemLines.NumItens; ++i)
+                {
+                    var line = itemLines.get_Edita(i);
+                    line.set_LocalizacaoOrigem(facilityIn);
+                    line.set_DataStock(data);
+                    lines.Insere(line);
+                }
+            }
+
+            doc.set_Linhas(lines);
+
+            var avisos = String.Empty;
             Engine.Comercial.Stocks.Actualiza(doc, ref avisos);
 
             return avisos;
@@ -141,7 +179,7 @@ namespace Picking.Lib_Primavera
 
             doc.set_Linhas(lines);
 
-            var avisos = string.Empty;
+            var avisos = String.Empty;
             Engine.Comercial.Stocks.Actualiza(doc, ref avisos);
 
             return avisos;
@@ -416,7 +454,7 @@ namespace Picking.Lib_Primavera
 
                 var listLinDv = new List<SupplyLine>();
                 var objListLin = _engine.Consulta(
-                    "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasCompras where IdCabecCompras='" +
+                    "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Putaway, CDU_PutawayQuantity from LinhasCompras where IdCabecCompras='" +
                     dv.Id + "' order By NumLinha"
                 );
 
@@ -437,9 +475,9 @@ namespace Picking.Lib_Primavera
                         Discount = objListLin.Valor("Desconto1"),
                         UnitPrice = objListLin.Valor("PrecUnit"),
                         TotalINet = objListLin.Valor("TotalIliquido"),
-                        TotalNet = objListLin.Valor("PrecoLiquido")
-                        // Putaway = objListLin.Valor("CDU_Putaway") == 1,
-                        // PutawayQuantity = objListLin.Valor("CDU_PutawayQuantity")
+                        TotalNet = objListLin.Valor("PrecoLiquido"),
+                        Putaway = objListLin.Valor("CDU_Putaway") == 1,
+                        PutawayQuantity = objListLin.Valor("CDU_PutawayQuantity")
                     };
 
                     listLinDv.Add(linDv);
@@ -475,7 +513,7 @@ namespace Picking.Lib_Primavera
 
             var listLinDv = new List<SupplyLine>();
             var objListLin = _engine.Consulta(
-                "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasCompras where IdCabecCompras='" +
+                "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Putaway, CDU_PutawayQuantity from LinhasCompras where IdCabecCompras='" +
                 dv.Id + "' order By NumLinha"
             );
 
@@ -496,9 +534,9 @@ namespace Picking.Lib_Primavera
                     Discount = objListLin.Valor("Desconto1"),
                     UnitPrice = objListLin.Valor("PrecUnit"),
                     TotalINet = objListLin.Valor("TotalIliquido"),
-                    TotalNet = objListLin.Valor("PrecoLiquido")
-                    // Putaway = objListLin.Valor("CDU_Putaway") == 1,
-                    // PutawayQuantity = objListLin.Valor("CDU_PutawayQuantity")
+                    TotalNet = objListLin.Valor("PrecoLiquido"),
+                    Putaway = objListLin.Valor("CDU_Putaway") == 1,
+                    PutawayQuantity = objListLin.Valor("CDU_PutawayQuantity")
                 };
 
                 listLinDv.Add(linDv);
@@ -556,7 +594,7 @@ namespace Picking.Lib_Primavera
 
                 var pickingItems = new List<PickingItem>();
                 var objListLin = _engine.Consulta(
-                    string.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id",
+                    String.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id",
                     pickingList.Id));
 
                 for (; !objListLin.NoFim(); objListLin.Seguinte())
@@ -592,7 +630,7 @@ namespace Picking.Lib_Primavera
 
             var objListCab =
                 _engine.Consulta(
-                    string.Format("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PickingList WHERE CDU_id={0}", id));
+                    String.Format("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PickingList WHERE CDU_id={0}", id));
 
             if (objListCab.Vazia())
                 return null;
@@ -606,7 +644,7 @@ namespace Picking.Lib_Primavera
 
             var pickingItems = new List<PickingItem>();
             var objListLin = _engine.Consulta(
-                string.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id", pickingList.Id));
+                String.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id", pickingList.Id));
 
             for (; !objListLin.NoFim(); objListLin.Seguinte())
             {
@@ -678,7 +716,7 @@ namespace Picking.Lib_Primavera
 
                 var putawayItems = new List<PutawayItem>();
                 var objListLin = _engine.Consulta(
-                    string.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id",
+                    String.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id",
                     putawayList.Id));
 
                 for (; !objListLin.NoFim(); objListLin.Seguinte())
@@ -714,7 +752,7 @@ namespace Picking.Lib_Primavera
 
             var objListCab =
                 _engine.Consulta(
-                    string.Format("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PutawayList WHERE CDU_id={0}", id));
+                    String.Format("SELECT CDU_id, CDU_date, CDU_pickerName FROM TDU_PutawayList WHERE CDU_id={0}", id));
 
             if (objListCab.Vazia())
                 return null;
@@ -728,7 +766,7 @@ namespace Picking.Lib_Primavera
 
             var putawayItems = new List<PutawayItem>();
             var objListLin = _engine.Consulta(
-                string.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id", putawayList.Id));
+                String.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id", putawayList.Id));
 
             for (; !objListLin.NoFim(); objListLin.Seguinte())
             {
@@ -755,53 +793,41 @@ namespace Picking.Lib_Primavera
             return putawayList;
         }
 
-        #endregion
-
-        #region Utilities
-
-        private void EnsureInitialized()
+        public void MarkSupplyLinePutaway(string supplyLineId)
         {
-            if (!_initialized)
-                throw new InvalidOperationException("Company not initialized!");
+            MarkSupplyLinePutaway(supplyLineId, true);
         }
 
-        private static string ExtractFacility(string location)
+        public void MarkSupplyLinePutaway(string supplyLineId, bool putaway)
         {
-            if (!string.IsNullOrWhiteSpace(location))
+            ExecuteQuery("UPDATE LinhasCompras SET CDU_Putaway = {0} WHERE Id = '{1}'", putaway ? 1 : 0, supplyLineId);
+        }
+
+        public void InsertPutawayItems(IEnumerable<PutawayItem> items)
+        {
+            var objListLin = _engine.Consulta(
+                "SELECT ISNULL(MAX(CDU_id), 0) as id FROM TDU_PutawayList"
+            );
+
+            var maxId = (int)objListLin.Valor("id");
+
+            ExecuteQuery("INSERT INTO TDU_PutawayList (CDU_id, CDU_date, CDU_pickerName) VALUES ({0}, '{1}', '{2}')",
+                maxId + 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.000"), "Zebino");
+
+            var i = 0;
+            foreach (var item in items)
             {
-                var splits = location.Split('.');
-                if (splits.Length > 0)
-                    return splits[0];
+                ExecuteQuery(
+                    "INSERT INTO TDU_PutawayItems (CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity," +
+                    "CDU_unit) VALUES ({0}, {1}, '{2}', '{3}', {4}, '{5}')", i, maxId + 1, item.Item.Id,
+                        item.StorageLocation, item.Quantity /* item.PutawayQuantity */, item.Unit);
+                ++i;
             }
-
-            return string.Empty;
         }
-
-        public int ExecuteQuery(string query, params object[] values)
-        {
-            return ExecuteQuery(string.Format(query, values));
-        }
-
-        public int ExecuteQuery(string query)
-        {
-            object count;
-            _connection.Execute(query, out count);
-            return (int)count;
-        }
-
-#endregion
-
-        #region Data
-
-        private bool _initialized;
-        private string _name;
-        private readonly StdPlatBS _platform = new StdPlatBS();
-        private readonly ErpBS _engine = new ErpBS();
-        private Connection _connection;
-
-        public ErpBS Engine { get { return _engine;  } }
 
         #endregion
+
+        #region Authentication
 
         public bool Login(string username, string password)
         {
@@ -832,5 +858,99 @@ namespace Picking.Lib_Primavera
                 return false;
             }
         }
+
+        #endregion
+
+        #region Utilities
+
+        private void EnsureInitialized()
+        {
+            if (!_initialized)
+                throw new InvalidOperationException("Company not initialized!");
+        }
+
+        public static string ExtractFacility(string location)
+        {
+            if (!String.IsNullOrWhiteSpace(location))
+            {
+                var splits = location.Split('.');
+                if (splits.Length > 0)
+                    return splits[0];
+            }
+
+            return String.Empty;
+        }
+
+        public int ExecuteQuery(string query, params object[] values)
+        {
+            return ExecuteQuery(String.Format(query, values));
+        }
+
+        public int ExecuteQuery(string query)
+        {
+            object count;
+            _connection.Execute(query, out count);
+            return (int)count;
+        }
+
+        public static string GetClosestLocation(IEnumerable<string> locations, string location)
+        {
+            var d = Double.PositiveInfinity;
+            string result = null;
+
+            var loc1 = Location.FromString(location);
+
+            foreach (var s in locations)
+            {
+                var loc2 = Location.FromString(s);
+                var dist = Location.GetDistance(loc1, loc2);
+
+                if (dist < d)
+                {
+                    result = s;
+                    d = dist;
+                }
+            }
+
+            return result;
+        }
+
+        public static ItemStock GetClosestLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)
+        {
+            var d = double.PositiveInfinity;
+            ItemStock result = null;
+
+            var loc1 = Location.FromString(previousStockLocation.StorageLocation);
+
+            foreach (var s in stock)
+            {
+                var loc2 = Location.FromString(s.StorageLocation);
+                var dist = Location.GetDistance(loc1, loc2);
+
+                if (dist < d)
+                {
+                    result = s;
+                    d = dist;
+                }
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Data
+
+        private bool _initialized;
+        private string _name;
+        private readonly StdPlatBS _platform = new StdPlatBS();
+        private readonly ErpBS _engine = new ErpBS();
+        private Connection _connection;
+
+        public ErpBS Engine { get { return _engine;  } }
+
+        #endregion
+
+
     }
 }

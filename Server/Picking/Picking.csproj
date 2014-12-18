@@ -130,6 +130,7 @@
     <Compile Include="Controllers\BasicAuthenticationAttribute.cs" />
     <Compile Include="Controllers\DebugController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
+    <Compile Include="Lib_Primavera\Model\Location.cs" />
     <Compile Include="Controllers\LocationsController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />

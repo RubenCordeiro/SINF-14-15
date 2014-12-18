@@ -1,6 +1,7 @@
 angular.module('sinfApp.controllers', [])
 
     .controller('AppCtrl', function ($scope, Restangular, AuthService, AlertPopupService, $ionicModal) {
+
         // Form data for the login modal
         $scope.loginData = {};
 
@@ -48,6 +49,10 @@ angular.module('sinfApp.controllers', [])
         $scope.setPicked1 =  function() { execute('set_picked'); };
         $scope.setPickedq0 = function() { execute('reset_pickedq'); };
         $scope.setPickedq1 = function() { execute('set_pickedq'); };
+        $scope.setPutaway0 =  function() { execute('reset_putaway'); };
+        $scope.setPutaway1 =  function() { execute('set_putaway'); };
+        $scope.setPutawayq0 = function() { execute('reset_putawayq'); };
+        $scope.setPutawayq1 = function() { execute('set_putawayq'); };
 
         $scope.reg = { user: '', pass: '' };
         $scope.register = function () {

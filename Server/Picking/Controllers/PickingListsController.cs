@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Web.Http;
 using Picking.Lib_Primavera;
 using Picking.Lib_Primavera.Model;
@@ -57,7 +54,7 @@ namespace Picking.Controllers
                     ItemStock previousStockLocation = null;
                     while (orderLine.Quantity > 0)
                     {
-                        var stockLocation = previousStockLocation == null ? stock[0] : GetClosestStockLocation(stock, previousStockLocation);
+                        var stockLocation = previousStockLocation == null ? stock[0] : Company.GetClosestLocation(stock, previousStockLocation);
                         previousStockLocation = stockLocation;
                         if (stockLocation == null)
                             continue;
@@ -147,69 +144,6 @@ namespace Picking.Controllers
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             return pickingList;
-        }
-
-        private static ItemStock GetClosestStockLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)
-        {
-            var d = double.PositiveInfinity;
-            ItemStock result = null;
-
-            var loc1 = Location.FromString(previousStockLocation.StorageLocation);
-
-            foreach (var s in stock)
-            {
-                var loc2 = Location.FromString(s.StorageLocation);
-                var dist = Location.GetDistance(loc1, loc2);
-
-                if (dist < d)
-                {
-                    result = s;
-                    d = dist;
-                }
-            }
-
-            return result;
-        }
-
-        private class Location
-        {
-            public static Location FromString(string location)
-            {
-                Contract.Requires(location != null);
-
-                var match = Regex.Match(location, "A([0-9]+)\\.C([0-9]+)\\.S([0-9]+)"); // A1.C1.S1
-                if (!match.Success)
-                    return null;
-
-                int a = int.Parse(match.Groups[1].ToString(), CultureInfo.InvariantCulture);
-                int c = int.Parse(match.Groups[2].ToString(), CultureInfo.InvariantCulture);
-                int s = int.Parse(match.Groups[3].ToString(), CultureInfo.InvariantCulture);
-
-                return new Location(a, c, s);
-            }
-
-            public Location(int a, int c, int s)
-            {
-                Facility = a;
-                Corridor = c;
-                Section = s;
-            }
-
-            public static double GetDistance(Location loc1, Location loc2)
-            {
-                Contract.Requires(loc1 != null);
-                Contract.Requires(loc2 != null);
-                Contract.Requires(loc1.Facility == loc2.Facility);
-
-                var v = Math.Abs(loc1.Corridor - loc2.Corridor);
-                var h = Math.Abs(loc1.Section - loc2.Section);
-
-                return v + h;
-            }
-
-            public int Facility { get; set; } // A
-            public int Corridor { get; set; } // C
-            public int Section { get; set; }  // S
         }
 
         private IEnumerable<ItemStock> GetStock(string itemId)

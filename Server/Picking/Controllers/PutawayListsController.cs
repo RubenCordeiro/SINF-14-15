@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Web.Http;
 using Picking.Lib_Primavera;
 using Picking.Lib_Primavera.Model;
@@ -13,20 +11,19 @@ namespace Picking.Controllers
 {
     public class PutawayListsController : ApiController
     {
-        /*
-        // POST /api/pickinglists/
-        public PickingList Post(PickingSelection selection)
+        // POST /api/putawaylists
+        public PutawayList Post(PutawaySelection selection)
         {
-            var pickingItems = new List<PickingItem>();
-            var skippedOrders = new List<OrderLine>();
+            var putawayItems = new List<PutawayItem>();
+            var skippedSupplies = new List<SupplyLine>();
 
-            foreach (var orderId in selection.Orders)
+            foreach (var supplyId in selection.Supplies)
             {
-                Order order;
+                Supply supply;
                 try
                 {
-                    order = _company.GetOrder(orderId);
-                    if (order == null)
+                    supply = _company.GetSupply(supplyId);
+                    if (supply == null)
                         continue;
                 }
                 catch (Exception)
@@ -34,104 +31,101 @@ namespace Picking.Controllers
                     continue;
                 }
 
-                foreach (var orderLine in order.OrderLines)
+                string previousStockLocation = null;
+                foreach (var supplyLine in supply.SupplyLines)
                 {
-                    if (orderLine.Picked)
+                    if (supplyLine.Putaway)
                         continue;
 
-                    if (Math.Abs(orderLine.PickedQuantity - orderLine.Quantity) < Double.Epsilon * 100)
-                        continue;
+                    //if (Math.Abs(supplyLine.PutawayQuantity - supplyLine.Quantity) < Double.Epsilon * 100)
+                    //    continue;
 
-                    var stock = GetStock(orderLine.Item.Id)
+                    var stock = GetStock(supplyLine.Item.Id)
                         .Where(itemStock => itemStock.Stock > 0 && itemStock.StorageFacility == selection.Facility)
-                        .OrderByDescending(itemStock => itemStock.Stock) // Prioritize by stock quantity
-                        .Where(itemStock => Location.FromString(itemStock.StorageLocation) != null) // Only valid locations
+                        .OrderByDescending(itemStock => itemStock.Stock)
                         .ToList();
 
-                    if (stock.Sum(itemStock => itemStock.Stock) < orderLine.Quantity)
+                    string location;
+                    if (stock.Count > 0) // if there are locations with the same items
+                        location = previousStockLocation == null ?
+                            stock[0].StorageLocation :
+                            Company.GetClosestLocation(stock.Select(itemStock => itemStock.StorageLocation), previousStockLocation);
+                    else
                     {
-                        skippedOrders.Add(orderLine);
-                        continue;
-                    }
+                        var locations = _company.ListStorageLocations()
+                            .Where(storageLocation => Location.FromString(storageLocation.Location) != null)
+                            .Select(storageLocation => storageLocation.Location)
+                            .ToList();
 
-                    ItemStock previousStockLocation = null;
-                    while (orderLine.Quantity > 0)
-                    {
-                        var stockLocation = previousStockLocation == null ? stock[0] : GetClosestStockLocation(stock, previousStockLocation);
-                        previousStockLocation = stockLocation;
-                        if (stockLocation == null)
+                        if (locations.Count == 0)
+                        {
+                            skippedSupplies.Add(supplyLine);
                             continue;
-
-                        double quantity;
-                        if (stockLocation.Stock > orderLine.Quantity)
-                        {
-                            quantity = orderLine.Quantity;
-                            orderLine.Quantity = 0;
-                        }
-                        else
-                        {
-                            quantity = stockLocation.Stock;
-                            orderLine.Quantity -= stockLocation.Stock;
                         }
 
-                        stockLocation.Stock -= quantity;
-
-                        if (Math.Abs(quantity) < Double.Epsilon)
-                            break;
-
-                        var pickingItem = new PickingItem
-                        {
-                            OrderLineId = orderLine.Id,
-                            Item = orderLine.Item,
-                            Quantity = quantity,
-                            Unit = orderLine.Unit,
-                            StorageFacility = stockLocation.StorageFacility,
-                            StorageLocation = stockLocation.StorageLocation,
-                        };
-
-                        pickingItems.Add(pickingItem);
-                        _company.MarkOrderLinePicked(orderLine.Id);
+                        location = previousStockLocation == null ? locations[0] :
+                            Company.GetClosestLocation(locations, previousStockLocation);
                     }
+
+                    previousStockLocation = location;
+
+                    var putawayItem = new PutawayItem
+                    {
+                        SupplyLineId = supplyLine.Id,
+                        Item = supplyLine.Item,
+                        Quantity = supplyLine.Quantity,
+                        Unit = supplyLine.Unit,
+                        StorageFacility = Company.ExtractFacility(location),
+                        StorageLocation = location,
+                    };
+
+                    putawayItems.Add(putawayItem);
+                    _company.MarkSupplyLinePutaway(supplyLine.Id);
                 }
             }
 
-            return new PickingList {Items = pickingItems, SkippedOrders = skippedOrders};
+            return new PutawayList {Items = putawayItems, SkippedSupplies = skippedSupplies};
         }
 
-        // PATCH /api/pickinglists
-        public IEnumerable<string> Patch(PickingList pickingList)
+        // PATCH /api/putawaylists
+        public IEnumerable<string> Patch(PutawayList putawayList)
         {
             var errors = new List<string>();
-            var itemsList = pickingList.Items.ToList();
+            var itemsList = putawayList.Items.ToList();
             if (itemsList.Count == 0)
             {
                 errors.Add("Empty input.");
                 return errors;
             }
 
-            foreach (var item in itemsList)
+            foreach (var item in itemsList.Where(item => item.StorageLocation == "none"))
             {
-                if (item.PickedQuantity < item.Quantity)
-                {
-                    var quantity = item.Quantity - item.PickedQuantity;
-                    var err1 = _company.GenerateStockRemovalDocument(item, quantity);
-                    if (!string.IsNullOrWhiteSpace(err1))
-                        errors.Add(err1);
-
-                    _company.MarkOrderLinePicked(item.OrderLineId, false);
-                }
-
-                _company.SetOrderLinePickedQuantity(item.OrderLineId, item.PickedQuantity);
+                _company.MarkSupplyLinePutaway(item.SupplyLineId, false);
             }
 
-            _company.InsertPickingItems(itemsList);
+            //foreach (var item in itemsList)
+            //{
+            //    //if (item.PickedQuantity < item.Quantity)
+            //    //{
+            //    //    var quantity = item.Quantity - item.PickedQuantity;
+            //    //    var err1 = _company.GenerateStockRemovalDocument(item, quantity);
+            //    //    if (!string.IsNullOrWhiteSpace(err1))
+            //    //        errors.Add(err1);
+            //    //
+            //    //    _company.MarkOrderLinePicked(item.OrderLineId, false);
+            //    //}
+            //
+            //    //_company.SetOrderLinePickedQuantity(item.OrderLineId, item.PickedQuantity);
+            //}
+
+            _company.InsertPutawayItems(itemsList);
 
             var err2 = _company.GenerateStockTransferDocument(itemsList);
             if (!string.IsNullOrWhiteSpace(err2))
                 errors.Add(err2);
 
             return errors;
-        }*/
+        }
 
         // GET /api/putawaylists
         public IEnumerable<PutawayList> Get()
@@ -149,74 +143,10 @@ namespace Picking.Controllers
             return putawayList;
         }
 
-        /*
-        private static ItemStock GetClosestStockLocation(IEnumerable<ItemStock> stock, ItemStock previousStockLocation)
-        {
-            var d = double.PositiveInfinity;
-            ItemStock result = null;
-
-            var loc1 = Location.FromString(previousStockLocation.StorageLocation);
-
-            foreach (var s in stock)
-            {
-                var loc2 = Location.FromString(s.StorageLocation);
-                var dist = Location.GetDistance(loc1, loc2);
-
-                if (dist < d)
-                {
-                    result = s;
-                    d = dist;
-                }
-            }
-
-            return result;
-        }
-
-        private class Location
-        {
-            public static Location FromString(string location)
-            {
-                Contract.Requires(location != null);
-
-                var match = Regex.Match(location, "A([0-9]+)\\.C([0-9]+)\\.S([0-9]+)"); // A1.C1.S1
-                if (!match.Success)
-                    return null;
-
-                int a = int.Parse(match.Groups[1].ToString());
-                int c = int.Parse(match.Groups[2].ToString());
-                int s = int.Parse(match.Groups[3].ToString());
-
-                return new Location(a, c, s);
-            }
-
-            public Location(int a, int c, int s)
-            {
-                Facility = a;
-                Corridor = c;
-                Section = s;
-            }
-
-            public static double GetDistance(Location loc1, Location loc2)
-            {
-                Contract.Requires(loc1 != null);
-                Contract.Requires(loc2 != null);
-                Contract.Requires(loc1.Facility == loc2.Facility);
-
-                var v = Math.Abs(loc1.Corridor - loc2.Corridor);
-                var h = Math.Abs(loc1.Section - loc2.Section);
-
-                return v + h;
-            }
-
-            public int Facility { get; set; } // A
-            public int Corridor { get; set; } // C
-            public int Section { get; set; }  // S
-        }
-
         private IEnumerable<ItemStock> GetStock(string itemId)
         {
-            return _company.ListItemStock().Where(stock => stock.Item == itemId);
-        }*/
+            return _company.ListItemStock().Where(stock => stock.Item == itemId && Location.FromString(stock.StorageLocation) != null);
+        }
 
         private readonly Company _company = new Company(Company.TargetCompany);
     }

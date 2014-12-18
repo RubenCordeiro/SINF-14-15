@@ -18,6 +18,14 @@ namespace Picking.Controllers
                     return _company.ExecuteQuery("UPDATE LinhasDoc SET CDU_PickedQuantity = 0").ToString();
                 case "set_pickedq":
                     return _company.ExecuteQuery("UPDATE LinhasDoc SET CDU_PickedQuantity = Quantidade").ToString();
+                case "reset_putaway":
+                    return _company.ExecuteQuery("UPDATE LinhasCompras SET CDU_Putaway = 0").ToString();
+                case "set_putaway":
+                    return _company.ExecuteQuery("UPDATE LinhasCompras SET CDU_Putaway = 1").ToString();
+                case "reset_putawayq":
+                    return _company.ExecuteQuery("UPDATE LinhasCompras SET CDU_PutawayQuantity = 0").ToString();
+                case "set_putawayq":
+                    return _company.ExecuteQuery("UPDATE LinhasCompras SET CDU_PutawayQuantity = Quantidade").ToString();
                 default:
                     return "Action " + action + " not handled.";
             }
