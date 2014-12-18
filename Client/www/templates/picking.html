@@ -16,17 +16,13 @@
                 <ion-item class="item-icon-left item-icon-right" ng-model="order.checked"
                           ng-checked="order.checked" ng-disabled="automatic"
                           ng-class="{active: isOrderShown(order)}">
-                    <div ng-click="order.checked = !order.checked">
-                        <i class="icon" ng-class="order.checked ? 'ion-ios-circle-filled' : 'ion-ios-circle-outline'"></i>
-                        <span>
-                            Serie {{order.Serie}}, Nº {{order.NumDoc}}<br>
-                            <small>{{order.EntityName}} - {{order.Data | amCalendar}}</small>
-                        </span>
-                        <span class="item-note" ng-click="toggleOrder(order)">
-                            {{order.TotalMerc | currency:"&euro;"}}<br>
-                            {{order.Processed}}% complete
-                        </span>
-                    </div>
+                    <i ng-click="order.checked = !order.checked" class="icon" ng-class="order.checked ? 'ion-ios-circle-filled' : 'ion-ios-circle-outline'"></i>
+                    <span ng-click="order.checked = !order.checked">Serie {{order.Serie}}, Nº {{order.NumDoc}}<br>
+                    <small>{{order.EntityName.split(' ')[0]}} - {{order.Data | amDateFormat:'YYYY-MM-DD HH:mm'}}</small></span>
+                    <span class="item-note" ng-click="toggleOrder(order)">
+                        {{order.TotalMerc | currency:"&euro;"}}<br>
+                        {{order.Processed}}% complete
+                    </span>
                     <i ng-click="toggleOrder(order)" class="icon" ng-class="isOrderShown(order) ? 'ion-ios-minus-empty' : 'ion-ios-plus-empty'"></i>
                 </ion-item>
                 <ion-item class="item-accordion item-stable"
@@ -45,7 +41,4 @@
         </label>
         <button ng-click="pickSelected()" ng-disabled="!anySelectedOrder()" class="button button-dark button-block">Pick Selected</button>
     </ion-content>
-    <div class="bar bar-footer">
-        <button class="button icon ion-information-circled pull-right" ng-click="showHelp()"></button>
-    </div>
 </ion-view>

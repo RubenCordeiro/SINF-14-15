@@ -16,17 +16,13 @@
                 <ion-item class="item-icon-left item-icon-right" ng-model="supply.checked"
                           ng-checked="supply.checked" ng-disabled="automatic"
                           ng-class="{active: isSupplyShown(supply)}">
-                    <div ng-click="supply.checked = !supply.checked">
-                        <i class="icon" ng-class="supply.checked ? 'ion-ios-circle-filled' : 'ion-ios-circle-outline'"></i>
-                        <span>
-                            Serie {{supply.Serie}}, Nº {{supply.NumDoc}}<br>
-                            <small>{{supply.EntityName}} - {{supply.Data | amCalendar}}</small>
-                        </span>
-                        <span class="item-note" ng-click="toggleSupply(supply)">
-                            {{supply.TotalMerc | currency:"&euro;"}}<br>
-                            {{supply.Processed}}% complete
-                        </span>
-                    </div>
+                    <i ng-click="supply.checked = !supply.checked" class="icon" ng-class="supply.checked ? 'ion-ios-circle-filled' : 'ion-ios-circle-outline'"></i>
+                    <span ng-click="supply.checked = !supply.checked">Serie {{supply.Serie}}, Nº {{supply.NumDoc}}<br>
+                    <small>{{supply.Entity}} - {{supply.Data | amDateFormat:'YYYY-MM-DD HH:mm'}}</small></span>
+                    <span class="item-note" ng-click="toggleSupply(supply)">
+                        {{supply.TotalMerc | currency:"&euro;"}}<br>
+                        {{supply.Processed}}% complete
+                    </span>
                     <i ng-click="toggleSupply(supply)" class="icon" ng-class="isSupplyShown(supply) ? 'ion-ios-minus-empty' : 'ion-ios-plus-empty'"></i>
                 </ion-item>
                 <ion-item class="item-accordion item-stable"
@@ -45,7 +41,4 @@
         </label>
         <button ng-click="putawaySelected()" ng-disabled="!anySelectedSupply()" class="button button-dark button-block">Putaway Selected</button>
     </ion-content>
-    <div class="bar bar-footer">
-        <button class="button icon ion-information-circled pull-right" ng-click="showHelp()"></button>
-    </div>
 </ion-view>

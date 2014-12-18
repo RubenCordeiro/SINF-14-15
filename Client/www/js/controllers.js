@@ -159,13 +159,6 @@ angular.module('sinfApp.controllers', [])
             });
         };
 
-        $scope.showHelp = function() {
-            $ionicPopup.alert({
-                title: 'Help Text',
-                template: '<p><strong>Automatic</strong> mode: orders are selected automatically<br><strong>Manual</strong> mode: select orders to pick</p>'
-            });
-        };
-
         $scope.pickSelected = function() {
             var checkedOrders = _.filter($scope.orders, function (order) {
                 return order.checked;
@@ -354,13 +347,6 @@ angular.module('sinfApp.controllers', [])
         $scope.anySelectedSupply = function () {
             return _.any($scope.supplies, function (supply) {
                 return supply.checked;
-            });
-        };
-
-        $scope.showHelp = function() {
-            $ionicPopup.alert({
-                title: 'Help Text',
-                template: '<p><strong>Automatic</strong> mode: supplies are selected automatically<br><strong>Manual</strong> mode: select supplies to putaway</p>'
             });
         };
 
