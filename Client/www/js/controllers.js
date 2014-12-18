@@ -379,22 +379,20 @@ angular.module('sinfApp.controllers', [])
         $scope.skippedSupplies = [];
 
         $scope.init = function () {
-
             $ionicLoading.show({
                 template: 'Loading...'
             });
 
             Restangular.all('putawaylists').post(putawayListService.get()).then(function (data) {
-                $ionicLoading.hide();
                 if (data.Items.length > 0) {
-
-                    $scope.items = data.Items;
-
-                    for (var i = 0; i < $scope.items.length; ++i) {
-                        $scope.items[i].disabled = i != 0;
-                        $scope.items[i].PutawayQuantity = $scope.items[i].Quantity + " " + $scope.items[i].Unit;
-                    }
+                    Restangular.all('locations').getList({type: 'full'}).then(function (locsData) {
+                        $ionicLoading.hide();
+                        $scope.locations = locsData;
+                        $scope.locations.push("none");
+                        $scope.items = data.Items;
+                    });
                 } else {
+                    $ionicLoading.hide();
                     $ionicPopup.alert({
                         title: 'Empty Putaway List',
                         template: '<p>Generated putaway list is empty. This might happen because all locations are full in ' + putawayListService.get().Facility + '</p>'
@@ -409,20 +407,6 @@ angular.module('sinfApp.controllers', [])
             });
         };
 
-        var clamp = function(num, min, max) {
-            return num < min ? min : (num > max ? max : num);
-        };
-
-        $scope.inputPutawayQuantityBlur = function (item) {
-            item.PutawayQuantity = clamp(parseFloat(item.PutawayQuantity), 0, item.Quantity) + " " + item.Unit;
-            if (isNaN(parseFloat(item.PutawayQuantity)))
-                item.PutawayQuantity = 0 + " " + item.Unit;
-        };
-
-        $scope.inputPutawayQuantityFocus = function (item) {
-            item.PutawayQuantity = parseFloat(item.PutawayQuantity);
-        };
-
         $scope.enableFinish = true;
 
         $scope.finished = function () {
@@ -430,14 +414,12 @@ angular.module('sinfApp.controllers', [])
                 template: 'Loading...'
             });
 
-            for (var i = 0; i < $scope.items.length; ++i) {
-                $scope.items[i].PutawayQuantity = parseFloat($scope.items[i].PutawayQuantity);
-            }
-
-            Restangular.all('putawaylists').patch({ Items: $scope.items, SkippedSupplies: $scope.skippedSupplies}).then(function () {
+            Restangular.all('putawaylists').patch({ Items: $scope.items, SkippedSupplies: $scope.skippedSupplies}).then(function (data) {
                 $ionicLoading.hide();
+                console.log(data);
                 $state.go('app.putaway');
             }, function (err) {
+                $ionicLoading.hide();
                 $ionicPopup.alert({
                     title: 'Error',
                     template: '<p>Error occurred: ' + JSON.stringify(err) + '</p>'

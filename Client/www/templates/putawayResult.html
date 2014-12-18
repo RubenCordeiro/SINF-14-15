@@ -1,17 +1,22 @@
 <ion-view view-title="Putaway Result" ng-init="init()">
     <ion-content padding="true" class="has-header">
         <ul class="list">
-            <li class="item" ng-repeat="item in items" ng-disabled="item.disabled">
+            <li class="item" ng-repeat="item in items">
                 <h2>{{item.Item.Id}}</h2>
-                <div class="item-note item-input">
-                    <label>
-                        <input style="display: inline; width: 100px" ng-model="item.PutawayQuantity" type="text" min="0"
-                               max="{{item.Quantity}}" step="0.1" ng-blur="inputPutawayQuantityBlur(item)"
-                               ng-focus="inputPutawayQuantityFocus(item)">
-                    </label>
+                <div class="item-note">
+                    <div class="list">
+
+                        <label class="item item-input item-select" style="width: 130px">
+                            <div class="input-label" style="padding-right: 0">
+                                L.
+                            </div>
+                            <select ng-model="item.StorageLocation" ng-options="l for l in locations" style="padding-left: 0; padding-right: 0; margin-right: 28px"></select>
+                        </label>
+
+                    </div>
                 </div>
                 <p>
-                    Warehouse: {{item.StorageFacility}}, Location: {{item.StorageLocation}}
+                    Warehouse: {{item.StorageFacility}} - {{item.Quantity}} {{item.Unit}}
                 </p>
             </li>
         </ul>

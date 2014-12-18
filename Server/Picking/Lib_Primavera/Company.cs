@@ -130,7 +130,7 @@ namespace Picking.Lib_Primavera
 
             foreach (var item in items)
             {
-                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.Item.Id, Armazem: facility, Localizacao: item.StorageLocation, Quantidade: item.PutawayQuantity, TipoDocStock: "TRA");
+                var itemLines = Engine.Comercial.Stocks.SugereArtigoLinhas(Artigo: item.Item.Id, Armazem: facility, Localizacao: item.StorageLocation, Quantidade: item.Quantity, TipoDocStock: "TRA");
                 for (var i = 1; i <= itemLines.NumItens; ++i)
                 {
                     var line = itemLines.get_Edita(i);

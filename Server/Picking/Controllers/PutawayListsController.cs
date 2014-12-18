@@ -98,9 +98,16 @@ namespace Picking.Controllers
                 return errors;
             }
 
+            var toRemove = new List<PutawayItem>();
             foreach (var item in itemsList.Where(item => item.StorageLocation == "none"))
             {
                 _company.MarkSupplyLinePutaway(item.SupplyLineId, false);
+                toRemove.Add(item);
+            }
+
+            foreach (var item in toRemove)
+            {
+                itemsList.Remove(item);
             }
 
             //foreach (var item in itemsList)

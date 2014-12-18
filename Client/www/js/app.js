@@ -187,7 +187,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
         // if none of the above states are matched, use this as the fallback
         $urlRouterProvider.otherwise('/app/home');
 
-        RestangularProvider.setBaseUrl("http://localhost/Picking/api");
+        RestangularProvider.setBaseUrl("http://192.168.1.73/Picking/api");
 
         RestangularProvider.addFullRequestInterceptor(function (element, operation, what, url, headers) {
             return {
