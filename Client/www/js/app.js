@@ -94,6 +94,16 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
                 controller: 'AppCtrl'
             })
 
+            .state('app.login', {
+                url: '/login',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/login.html',
+                        controller: 'LoginCtrl'
+                    }
+                }
+            })
+
             .state('app.home', {
                 url: '/home',
                 views: {

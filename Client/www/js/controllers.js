@@ -1,9 +1,6 @@
 angular.module('sinfApp.controllers', [])
 
-    .controller('AppCtrl', function ($scope, Restangular, AuthService, AlertPopupService, $ionicModal) {
-
-        // Form data for the login modal
-        $scope.loginData = {};
+    .controller('AppCtrl', function ($scope, Restangular, AuthService, AlertPopupService, $ionicModal, $state) {
 
         // Create the login modal that we will use later
         $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -19,20 +16,9 @@ angular.module('sinfApp.controllers', [])
 
         // Open the login modal
         $scope.login = function () {
-            if (!AuthService.isLoggedIn()) $scope.modal.show();
+            $state.go('app.login');
         };
 
-        // Perform the login action when the user submits the login form
-        $scope.doLogin = function () {
-            console.log('Doing login', $scope.loginData);
-
-            Restangular.all('login').post($scope.loginData).then(function (data) {
-                AuthService.login($scope.loginData.username, data);
-                $scope.closeLogin();
-            }, function (response) {
-                AlertPopupService.createPopup("Error", response.data.error);
-            });
-        };
     })
 
     .controller('HomeCtrl', function ($scope, Restangular, $ionicPopup) {
@@ -180,6 +166,22 @@ angular.module('sinfApp.controllers', [])
 
         $scope.isOrderShown = function(Order) {
             return $scope.shownOrder === Order;
+        };
+    })
+
+    .controller('LoginCtrl', function($scope, Restangular, AuthService, AlertPopupService, $state) {
+
+        $scope.loginData = {};
+
+        $scope.login = function() {
+            console.log('Doing login', $scope.loginData);
+
+            Restangular.all('login').post($scope.loginData).then(function (data) {
+                AuthService.login($scope.loginData.username, data);
+                $state.go('app.home');
+            }, function (response) {
+                AlertPopupService.createPopup("Error", response.data.error);
+            });
         };
     })
 
