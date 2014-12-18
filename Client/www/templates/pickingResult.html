@@ -2,7 +2,7 @@
     <ion-content padding="true" class="has-header">
         <ul class="list">
             <li class="item" ng-repeat="item in items" ng-disabled="item.disabled">
-                <h2>{{item.ItemId}}</h2>
+                <h2>{{item.Item.Id}}</h2>
                 <div class="item-note item-input">
                     <label>
                         <input style="display: inline; width: 100px" ng-model="item.PickedQuantity" type="text" min="0"

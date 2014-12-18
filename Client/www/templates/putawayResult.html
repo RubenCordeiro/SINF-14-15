@@ -2,7 +2,7 @@
     <ion-content padding="true" class="has-header">
         <ul class="list">
             <li class="item" ng-repeat="item in items" ng-disabled="item.disabled">
-                <h2>{{item.ItemId}}</h2>
+                <h2>{{item.Item.Id}}</h2>
                 <div class="item-note item-input">
                     <label>
                         <input style="display: inline; width: 100px" ng-model="item.PutawayQuantity" type="text" min="0"
@@ -21,11 +21,11 @@
             <div class="item item-divider" ng-show="showSkippedSupplies">
                 Skipped Supplies (no stock)
             </div>
-            <ion-item class="item" ng-repeat="order in skippedSupplies" ng-show="showSkippedSupplies">
-                <h2>{{order.Item.Id}}</h2>
-                <h3>{{order.Item.Description}}</h3>
+            <ion-item class="item" ng-repeat="supply in skippedSupplies" ng-show="showSkippedSupplies">
+                <h2>{{supply.Item.Id}}</h2>
+                <h3>{{supply.Item.Description}}</h3>
                 <div class="item-note">
-                    {{order.Quantity}} {{order.Unit}}
+                    {{supply.Quantity}} {{supply.Unit}}
                 </div>
             </ion-item>
         </ion-list>

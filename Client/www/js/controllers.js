@@ -329,7 +329,7 @@ angular.module('sinfApp.controllers', [])
 
                 _.each($scope.supplies, function(supply) {
                     var numProcessed = _.filter(supply.SupplyLines, function(supplyline) {
-                        return supplyline.Picked;
+                        return supplyline.Putaway;
                     }).length;
 
                     supply.Processed = Math.round(numProcessed / supply.SupplyLines.length) * 100;
@@ -406,7 +406,7 @@ angular.module('sinfApp.controllers', [])
                 } else {
                     $ionicPopup.alert({
                         title: 'Empty Putaway List',
-                        template: '<p>Generated putaway list is empty. This might happen because there is not enough stock in ' + putawayListService.get().Facility + '</p>'
+                        template: '<p>Generated putaway list is empty. This might happen because all locations are full in ' + putawayListService.get().Facility + '</p>'
                     }).then(function () {
                         $state.go('app.putaway');
                     });
