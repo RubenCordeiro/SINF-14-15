@@ -13,10 +13,10 @@ namespace Picking.Controllers
         // POST /api/register
         public string Post(UserPassword loginInfo)
         {
-            if (!_company.Register(loginInfo.username, loginInfo.password))
+            if (!_company.Register(loginInfo.Username, loginInfo.Password))
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized));
 
-            var tokenContents = Encoding.UTF8.GetBytes(loginInfo.username + ":" + loginInfo.password);
+            var tokenContents = Encoding.UTF8.GetBytes(loginInfo.Username + ":" + loginInfo.Password);
             return Convert.ToBase64String(tokenContents);
         }
 

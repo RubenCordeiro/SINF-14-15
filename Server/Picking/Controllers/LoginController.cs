@@ -13,9 +13,9 @@ namespace Picking.Controllers
         // POST /api/login
         public string Post(UserPassword loginInfo)
         {
-            if (_company.Login(loginInfo.username, loginInfo.password))
+            if (_company.Login(loginInfo.Username, loginInfo.Password))
             {
-                var tokenContents = Encoding.UTF8.GetBytes(loginInfo.username + ":" + loginInfo.password);
+                var tokenContents = Encoding.UTF8.GetBytes(loginInfo.Username + ":" + loginInfo.Password);
                 return Convert.ToBase64String(tokenContents);
             }
 

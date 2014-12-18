@@ -29,7 +29,7 @@ angular.module('sinfApp.controllers', [])
                     template: JSON.stringify(data)
                 });
             });
-        }
+        };
 
         $scope.reg = { user: '', pass: '' };
         $scope.register = function () {
@@ -168,7 +168,7 @@ angular.module('sinfApp.controllers', [])
             console.log('Doing login', $scope.loginData);
 
             Restangular.all('login').post($scope.loginData).then(function (data) {
-                AuthService.login($scope.loginData.username, data);
+                AuthService.login($scope.loginData.Username, data);
                 $state.go('app.home');
             }, function (response) {
                 AlertPopupService.createPopup("Error", response.data.error);
