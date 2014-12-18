@@ -15,7 +15,8 @@
             <div ng-repeat="supply in supplies | filter:search">
                 <ion-item class="item-icon-left item-icon-right" ng-model="supply.checked"
                           ng-checked="supply.checked" ng-disabled="automatic"
-                          ng-class="{active: isSupplyShown(supply)}">
+                          ng-class="{active: isSupplyShown(supply)}"
+                          ng-show="supply.Processed != 100">
                     <i ng-click="supply.checked = !supply.checked" class="icon" ng-class="supply.checked ? 'ion-ios-circle-filled' : 'ion-ios-circle-outline'"></i>
                     <span ng-click="supply.checked = !supply.checked">Serie {{supply.Serie}}, Nº {{supply.NumDoc}}<br>
                     <small>{{supply.Entity}} - {{supply.Data | amDateFormat:'YYYY-MM-DD HH:mm'}}</small></span>

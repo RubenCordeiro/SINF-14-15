@@ -15,7 +15,8 @@
             <div ng-repeat="order in orders | filter:search">
                 <ion-item class="item-icon-left item-icon-right" ng-model="order.checked"
                           ng-checked="order.checked" ng-disabled="automatic"
-                          ng-class="{active: isOrderShown(order)}">
+                          ng-class="{active: isOrderShown(order)}""
+                          ng-show="order.Processed != 100">
                     <i ng-click="order.checked = !order.checked" class="icon" ng-class="order.checked ? 'ion-ios-circle-filled' : 'ion-ios-circle-outline'"></i>
                     <span ng-click="order.checked = !order.checked">Serie {{order.Serie}}, Nº {{order.NumDoc}}<br>
                     <small>{{order.EntityName.split(' ')[0]}} - {{order.Data | amDateFormat:'YYYY-MM-DD HH:mm'}}</small></span>
