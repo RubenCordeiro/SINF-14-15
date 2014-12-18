@@ -186,8 +186,6 @@ angular.module('sinfApp.controllers', [])
     })
 
     .controller('PickingResultCtrl', function ($scope, $state, $stateParams, pickingListService, Restangular, $ionicLoading, $ionicPopup) {
-        $scope.title = /*$stateParams.pickingId*/ 'Picking List';
-
         $scope.items = [];
         $scope.skippedOrders = [];
 
@@ -252,7 +250,7 @@ angular.module('sinfApp.controllers', [])
                 $state.go('app.picking');
             }, function (err) {
                 $ionicPopup.alert({
-                    title: 'Help Text',
+                    title: 'Error',
                     template: '<p>Error occurred: ' + JSON.stringify(err) + '</p>'
                 });
             });
@@ -385,33 +383,74 @@ angular.module('sinfApp.controllers', [])
         };
     })
 
-    .controller('PutawayResultCtrl', function ($scope, $stateParams) {
-        $scope.title = $stateParams.putawayId;
+    .controller('PutawayResultCtrl', function ($scope, $state, $stateParams, putawayListService, Restangular, $ionicLoading, $ionicPopup) {
+        $scope.items = [];
+        $scope.skippedSupplies = [];
 
-        $scope.items = [
-            { checked: false, disabled: true, ItemId: 'IT1', Quantity: 11.2, Unit: 'kg',  StorageFacility: 'A1', StorageLocation: 'A1S1.1' },
-            { checked: false, disabled: true, ItemId: 'IT2', Quantity: 2,    Unit: 'SKU', StorageFacility: 'A1', StorageLocation: 'A1S4.1' },
-            { checked: false, disabled: true, ItemId: 'IT3', Quantity: 13,   Unit: 'm',   StorageFacility: 'A1', StorageLocation: 'A1S2.3' },
-            { checked: false, disabled: true, ItemId: 'IT4', Quantity: 10,   Unit: 'SKU', StorageFacility: 'A1', StorageLocation: 'A1S2.2' },
-            { checked: false, disabled: true, ItemId: 'IT5', Quantity: 115,  Unit: 'g',   StorageFacility: 'A1', StorageLocation: 'A1S2.1' }
-        ];
+        $scope.init = function () {
 
-        $scope.items[0].disabled = false;
-        $scope.enableFinish = false;
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
 
-        $scope.itemChecked = function (id ) {
-            $scope.items[id].disabled = true;
+            Restangular.all('putawaylists').post(putawayListService.get()).then(function (data) {
+                $ionicLoading.hide();
+                if (data.Items.length > 0) {
 
-            if (id + 1 < $scope.items.length) {
-                $scope.items[id + 1].disabled = false;
-            }
+                    $scope.items = data.Items;
 
-            $scope.enableFinish = true;
-            for (var i = 0; i < $scope.items.length; ++i) {
-                if (!$scope.items[i].checked) {
-                    $scope.enableFinish = false;
-                    break;
+                    for (var i = 0; i < $scope.items.length; ++i) {
+                        $scope.items[i].disabled = i != 0;
+                        $scope.items[i].PutawayQuantity = $scope.items[i].Quantity + " " + $scope.items[i].Unit;
+                    }
+                } else {
+                    $ionicPopup.alert({
+                        title: 'Empty Putaway List',
+                        template: '<p>Generated putaway list is empty. This might happen because there is not enough stock in ' + putawayListService.get().Facility + '</p>'
+                    }).then(function () {
+                        $state.go('app.putaway');
+                    });
                 }
+
+                if (data.SkippedSupplies.length > 0) {
+                    $scope.skippedSupplies = data.SkippedSupplies;
+                }
+            });
+        };
+
+        var clamp = function(num, min, max) {
+            return num < min ? min : (num > max ? max : num);
+        };
+
+        $scope.inputPutawayQuantityBlur = function (item) {
+            item.PutawayQuantity = clamp(parseFloat(item.PutawayQuantity), 0, item.Quantity) + " " + item.Unit;
+            if (isNaN(parseFloat(item.PutawayQuantity)))
+                item.PutawayQuantity = 0 + " " + item.Unit;
+        };
+
+        $scope.inputPutawayQuantityFocus = function (item) {
+            item.PutawayQuantity = parseFloat(item.PutawayQuantity);
+        };
+
+        $scope.enableFinish = true;
+
+        $scope.finished = function () {
+            $ionicLoading.show({
+                template: 'Loading...'
+            });
+
+            for (var i = 0; i < $scope.items.length; ++i) {
+                $scope.items[i].PutawayQuantity = parseFloat($scope.items[i].PutawayQuantity);
             }
+
+            Restangular.all('putawaylists').patch({ Items: $scope.items, SkippedSupplies: $scope.skippedSupplies}).then(function () {
+                $ionicLoading.hide();
+                $state.go('app.putaway');
+            }, function (err) {
+                $ionicPopup.alert({
+                    title: 'Error',
+                    template: '<p>Error occurred: ' + JSON.stringify(err) + '</p>'
+                });
+            });
         };
     });

@@ -1,19 +1,36 @@
-<ion-view view-title="Putaway {{title}}">
+<ion-view view-title="Putaway Result" ng-init="init()">
     <ion-content padding="true" class="has-header">
-        <ion-list>
-            <ion-checkbox class="item" ng-repeat="item in items" ng-model="item.checked"
-                          ng-checked="item.checked" ng-disabled="item.disabled" ng-change="itemChecked($index)">
+        <ul class="list">
+            <li class="item" ng-repeat="item in items" ng-disabled="item.disabled">
                 <h2>{{item.ItemId}}</h2>
-                <div class="item-note">
-                    {{item.Quantity}} {{item.Unit}}
+                <div class="item-note item-input">
+                    <label>
+                        <input style="display: inline; width: 100px" ng-model="item.PutawayQuantity" type="text" min="0"
+                               max="{{item.Quantity}}" step="0.1" ng-blur="inputPutawayQuantityBlur(item)"
+                               ng-focus="inputPutawayQuantityFocus(item)">
+                    </label>
                 </div>
                 <p>
                     Warehouse: {{item.StorageFacility}}, Location: {{item.StorageLocation}}
                 </p>
-            </ion-checkbox>
+            </li>
+        </ul>
+        <p></p>
+        <ion-list ng-show="skippedSupplies.length > 0">
+            <ion-toggle ng-model="showSkippedSupplies" toggle-class="toggle-positive">Show Skipped Supplies</ion-toggle>
+            <div class="item item-divider" ng-show="showSkippedSupplies">
+                Skipped Supplies (no stock)
+            </div>
+            <ion-item class="item" ng-repeat="order in skippedSupplies" ng-show="showSkippedSupplies">
+                <h2>{{order.Item.Id}}</h2>
+                <h3>{{order.Item.Description}}</h3>
+                <div class="item-note">
+                    {{order.Quantity}} {{order.Unit}}
+                </div>
+            </ion-item>
         </ion-list>
     </ion-content>
     <div class="bar bar-clear bar-footer">
-        <a ng-disabled="!enableFinish" href="#/app/putaway" class="button button-positive pull-right">Finished</a>
+        <a ng-disabled="!enableFinish" ng-click="finished()" class="button button-positive pull-right">Finished</a>
     </div>
 </ion-view>

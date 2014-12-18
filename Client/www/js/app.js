@@ -173,7 +173,7 @@ angular.module('sinfApp', ['ionic', 'angularMoment', 'sinfApp.controllers', 'res
             })
 
             .state('app.putawayResult', {
-                url: '/putaway/:putawayId',
+                url: '/putawayResult',
                 views: {
                     'menuContent': {
                         templateUrl: 'templates/putawayResult.html',
