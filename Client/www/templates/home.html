@@ -19,8 +19,8 @@
                     </a>
                 </div>
             </div>
-            <div class="item item-divider">Debug (development only)</div>
-            <div class="item item-body">
+            <div class="item item-divider" ng-show="isAdmin()">Debug (development only)</div>
+            <div class="item item-body" ng-show="isAdmin()">
                 <div class="list">
                     <a class="item item-stable item-icon-left item-icon-right" ng-click="executeDebug('reset_picked')">
                         <i class="icon ion-bug"></i>Set Picked = 0<i class="icon ion-arrow-return-right"></i>

@@ -32,7 +32,7 @@ angular.module('sinfApp.controllers', [])
 		});
     })
 
-    .controller('HomeCtrl', function ($scope, Restangular, $ionicPopup) {
+    .controller('HomeCtrl', function ($scope, Restangular, AuthService, $ionicPopup) {
 
         $scope.executeDebug = function(action) {
             Restangular.one('debug').get({ action: action }).then(function (data) {
@@ -50,6 +50,10 @@ angular.module('sinfApp.controllers', [])
                 });
             });
         }
+
+        $scope.isAdmin = function () {
+            return AuthService.currentUser().username == 'admin';
+        };
     })
 
     .controller('LoginCtrl', function($scope, Restangular, AuthService, AlertPopupService, $state) {
