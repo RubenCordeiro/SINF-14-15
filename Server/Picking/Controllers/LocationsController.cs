@@ -22,7 +22,7 @@ namespace Picking.Controllers
             {
                 case "full":
                     return _company.ListStorageLocations()
-                        .Where(location => Location.FromString(location.Location) != null)
+                        .Where(location => LocationHelper.FromString(location.Location) != null)
                         .Select(location => location.Location);
                 default:
                     throw new HttpRequestValidationException(type);

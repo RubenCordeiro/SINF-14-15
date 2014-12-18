@@ -10,6 +10,8 @@
 
         public string StorageLocation { get; set; }
 
+        public double StorageCapacity { get; set; }
+
         public double Quantity { get; set; }
 
         public double PickedQuantity { get; set; }

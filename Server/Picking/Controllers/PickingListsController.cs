@@ -42,7 +42,7 @@ namespace Picking.Controllers
                     var stock = GetStock(orderLine.Item.Id)
                         .Where(itemStock => itemStock.Stock > 0 && itemStock.StorageFacility == selection.Facility)
                         .OrderByDescending(itemStock => itemStock.Stock) // Prioritize by stock quantity
-                        .Where(itemStock => Location.FromString(itemStock.StorageLocation) != null) // Only valid locations
+                        .Where(itemStock => LocationHelper.FromString(itemStock.StorageLocation) != null) // Only valid locations
                         .ToList();
 
                     if (stock.Sum(itemStock => itemStock.Stock) < orderLine.Quantity)

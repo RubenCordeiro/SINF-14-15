@@ -9,5 +9,7 @@
         public double Stock { get; set; }
 
         public string StorageLocation { get; set; }
+
+        public double StorageCapacity { get; set; }
     }
 }

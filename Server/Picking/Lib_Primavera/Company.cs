@@ -6,7 +6,6 @@ using Interop.ErpBS800;
 using Interop.GcpBE800;
 using Interop.StdBE800;
 using Interop.StdPlatBS800;
-using Picking.Controllers;
 using Picking.Lib_Primavera.Model;
 
 // ReSharper disable UseIndexedProperty
@@ -200,7 +199,8 @@ namespace Picking.Lib_Primavera
             return new Item
             {
                 Id = objArtigo.get_Artigo(),
-                Description = objArtigo.get_Descricao()
+                Description = objArtigo.get_Descricao(),
+                Volume = objArtigo.get_Volume()
             };
         }
 
@@ -232,7 +232,7 @@ namespace Picking.Lib_Primavera
 
             for (
                 var objItemStocksList =
-                    _engine.Consulta("SELECT Artigo, Armazem, StkActual, Localizacao FROM ArtigoArmazem");
+                    _engine.Consulta("SELECT Artigo, ArtigoArmazem.Armazem, StkActual, ArtigoArmazem.Localizacao, CDU_capacity FROM ArtigoArmazem INNER JOIN ArmazemLocalizacoes ON ArtigoArmazem.Localizacao = ArmazemLocalizacoes.Localizacao");
                 !objItemStocksList.NoFim();
                 objItemStocksList.Seguinte())
             {
@@ -242,6 +242,7 @@ namespace Picking.Lib_Primavera
                     Stock = objItemStocksList.Valor("StkActual"),
                     StorageFacility = objItemStocksList.Valor("Armazem"),
                     StorageLocation = objItemStocksList.Valor("Localizacao"),
+                    StorageCapacity = objItemStocksList.Valor("CDU_capacity")
                 });
             }
 
@@ -251,24 +252,6 @@ namespace Picking.Lib_Primavera
         #endregion
 
         #region Facilities & Locations
-
-        public StorageLocation GetStorageLocation(string location)
-        {
-            EnsureInitialized();
-
-            if (!_engine.Comercial.ArmazemLocalizacao.Existe(location)) return null;
-
-            var objLocation = _engine.Comercial.ArmazemLocalizacao.Edita(location);
-
-            return new StorageLocation
-            {
-                Id = objLocation.get_ID(),
-                Location = objLocation.get_Localizacao(),
-                StorageFacility = objLocation.get_Armazem(),
-                Description = objLocation.get_Descricao(),
-                IdParent = objLocation.get_IdPai()
-            };
-        }
 
         public IEnumerable<string> ListStorageFacilities()
         {
@@ -301,6 +284,7 @@ namespace Picking.Lib_Primavera
                     Location = objLocations.Valor("Localizacao"),
                     StorageFacility = objLocations.Valor("Armazem"),
                     Description = objLocations.Valor("Descricao"),
+                    StorageCapacity = objLocations.Valor("CDU_capacity"),
                     IdParent = objLocations.Valor("IdPai")
                 });
             }
@@ -336,7 +320,8 @@ namespace Picking.Lib_Primavera
 
                 var listLinDv = new List<OrderLine>();
                 var objListLin = _engine.Consulta(
-                    "SELECT idCabecDoc, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Picked, CDU_PickedQuantity from LinhasDoc where IdCabecDoc='" +
+                    "SELECT LinhasDoc.idCabecDoc, LinhasDoc.Id, LinhasDoc.NumLinha, Artigo.Artigo, LinhasDoc.Descricao, LinhasDoc.Quantidade, LinhasDoc.Unidade, Volume, LinhasDoc.PrecUnit," +
+                    "LinhasDoc.Desconto1, LinhasDoc.TotalILiquido, LinhasDoc.PrecoLiquido, LinhasDoc.CDU_Picked, LinhasDoc.CDU_PickedQuantity from LinhasDoc INNER JOIN Artigo ON Artigo.Artigo = LinhasDoc.Artigo where IdCabecDoc='" +
                     dv.Id + "' order By NumLinha"
                 );
 
@@ -350,7 +335,8 @@ namespace Picking.Lib_Primavera
                         Item = new Item
                         {
                             Id = objListLin.Valor("Artigo"),
-                            Description = objListLin.Valor("Descricao")
+                            Description = objListLin.Valor("Descricao"),
+                            Volume = objListLin.Valor("Volume")
                         },
                         Quantity = objListLin.Valor("Quantidade"),
                         Unit = objListLin.Valor("Unidade"),
@@ -394,8 +380,10 @@ namespace Picking.Lib_Primavera
             var listlindv = new List<OrderLine>();           
             
             var objListLin = _engine.Consulta(
-                "SELECT idCabecDoc, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Picked, CDU_PickedQuantity from LinhasDoc where IdCabecDoc='" +
-                dv.Id + "' order By NumLinha");
+                "SELECT LinhasDoc.idCabecDoc, LinhasDoc.Id, LinhasDoc.NumLinha, Artigo.Artigo, LinhasDoc.Descricao, LinhasDoc.Quantidade, LinhasDoc.Unidade, Volume, LinhasDoc.PrecUnit," +
+                "LinhasDoc.Desconto1, LinhasDoc.TotalILiquido, LinhasDoc.PrecoLiquido, LinhasDoc.CDU_Picked, LinhasDoc.CDU_PickedQuantity from LinhasDoc INNER JOIN Artigo ON Artigo.Artigo = LinhasDoc.Artigo where IdCabecDoc='" +
+                dv.Id + "' order By NumLinha"
+            );
 
             for (; !objListLin.NoFim(); objListLin.Seguinte())
             {
@@ -406,7 +394,8 @@ namespace Picking.Lib_Primavera
                     Item = new Item
                     {
                         Id = objListLin.Valor("Artigo"),
-                        Description = objListLin.Valor("Descricao")
+                        Description = objListLin.Valor("Descricao"),
+                        Volume = objListLin.Valor("Volume")
                     },
                     Quantity = objListLin.Valor("Quantidade"),
                     Unit = objListLin.Valor("Unidade"),
@@ -454,7 +443,8 @@ namespace Picking.Lib_Primavera
 
                 var listLinDv = new List<SupplyLine>();
                 var objListLin = _engine.Consulta(
-                    "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Putaway, CDU_PutawayQuantity from LinhasCompras where IdCabecCompras='" +
+                    "SELECT LinhasCompras.IdCabecCompras, LinhasCompras.Id, LinhasCompras.NumLinha, LinhasCompras.Artigo, LinhasCompras.Descricao, LinhasCompras.Quantidade, LinhasCompras.Unidade, Volume, LinhasCompras.PrecUnit, LinhasCompras.Desconto1," +
+                    "LinhasCompras.TotalILiquido, LinhasCompras.PrecoLiquido, CDU_Putaway, CDU_PutawayQuantity from LinhasCompras INNER JOIN Artigo ON Artigo.Artigo = LinhasCompras.Artigo where IdCabecCompras='" +
                     dv.Id + "' order By NumLinha"
                 );
 
@@ -468,7 +458,8 @@ namespace Picking.Lib_Primavera
                         Item = new Item
                         {
                             Id = objListLin.Valor("Artigo"),
-                            Description = objListLin.Valor("Descricao")
+                            Description = objListLin.Valor("Descricao"),
+                            Volume = objListLin.Valor("Volume")
                         },
                         Quantity = objListLin.Valor("Quantidade"),
                         Unit = objListLin.Valor("Unidade"),
@@ -513,8 +504,9 @@ namespace Picking.Lib_Primavera
 
             var listLinDv = new List<SupplyLine>();
             var objListLin = _engine.Consulta(
-                "SELECT IdCabecCompras, Id, NumLinha, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido, CDU_Putaway, CDU_PutawayQuantity from LinhasCompras where IdCabecCompras='" +
-                dv.Id + "' order By NumLinha"
+                "SELECT LinhasCompras.IdCabecCompras, LinhasCompras.Id, LinhasCompras.NumLinha, LinhasCompras.Artigo, LinhasCompras.Descricao, LinhasCompras.Quantidade, LinhasCompras.Unidade, Volume, LinhasCompras.PrecUnit, LinhasCompras.Desconto1," +
+                    "LinhasCompras.TotalILiquido, LinhasCompras.PrecoLiquido, CDU_Putaway, CDU_PutawayQuantity from LinhasCompras INNER JOIN Artigo ON Artigo.Artigo = LinhasCompras.Artigo where IdCabecCompras='" +
+                    dv.Id + "' order By NumLinha"
             );
 
             for (; !objListLin.NoFim(); objListLin.Seguinte())
@@ -527,7 +519,8 @@ namespace Picking.Lib_Primavera
                     Item = new Item
                     {
                         Id = objListLin.Valor("Artigo"),
-                        Description = objListLin.Valor("Descricao")
+                        Description = objListLin.Valor("Descricao"),
+                        Volume = objListLin.Valor("Volume")
                     },
                     Quantity = objListLin.Valor("Quantidade"),
                     Unit = objListLin.Valor("Unidade"),
@@ -594,7 +587,7 @@ namespace Picking.Lib_Primavera
 
                 var pickingItems = new List<PickingItem>();
                 var objListLin = _engine.Consulta(
-                    String.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id",
+                    String.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, Artigo.Descricao, Artigo.Volume, CDU_storageLocation, CDU_capacity, CDU_quantity, CDU_unit FROM TDU_PickingItems INNER JOIN Artigo ON Artigo.Artigo LIKE CDU_itemId INNER JOIN ArmazemLocalizacoes ON Localizacao LIKE CDU_storageLocation WHERE CDU_pickingListId='{0}' ORDER BY CDU_id",
                     pickingList.Id));
 
                 for (; !objListLin.NoFim(); objListLin.Seguinte())
@@ -603,9 +596,12 @@ namespace Picking.Lib_Primavera
                     {
                         Item = new Item
                         {
-                            Id = objListLin.Valor("CDU_itemId")
+                            Id = objListLin.Valor("CDU_itemId"),
+                            Description = objListLin.Valor("Descricao"),
+                            Volume = objListLin.Valor("Volume")
                         },
                         StorageLocation = objListLin.Valor("CDU_storageLocation"),
+                        StorageCapacity = objListLin.Valor("CDU_capacity"),
                         Quantity = objListLin.Valor("CDU_quantity"),
                         Unit = objListLin.Valor("CDU_unit")
                     };
@@ -644,7 +640,8 @@ namespace Picking.Lib_Primavera
 
             var pickingItems = new List<PickingItem>();
             var objListLin = _engine.Consulta(
-                String.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PickingItems WHERE CDU_pickingListId='{0}' ORDER BY CDU_id", pickingList.Id));
+                String.Format("SELECT CDU_id, CDU_pickingListId, CDU_itemId, Artigo.Descricao, Artigo.Volume, CDU_storageLocation, CDU_capacity, CDU_quantity, CDU_unit FROM TDU_PickingItems INNER JOIN Artigo ON Artigo.Artigo LIKE CDU_itemId INNER JOIN ArmazemLocalizacoes ON Localizacao LIKE CDU_storageLocation WHERE CDU_pickingListId='{0}' ORDER BY CDU_id",
+                pickingList.Id));
 
             for (; !objListLin.NoFim(); objListLin.Seguinte())
             {
@@ -652,9 +649,12 @@ namespace Picking.Lib_Primavera
                 {
                     Item = new Item
                     {
-                        Id = objListLin.Valor("CDU_itemId")
+                        Id = objListLin.Valor("CDU_itemId"),
+                        Description = objListLin.Valor("Descricao"),
+                        Volume = objListLin.Valor("Volume")
                     },
                     StorageLocation = objListLin.Valor("CDU_storageLocation"),
+                    StorageCapacity = objListLin.Valor("CDU_capacity"),
                     Quantity = objListLin.Valor("CDU_quantity"),
                     Unit = objListLin.Valor("CDU_unit")
                 };
@@ -716,7 +716,7 @@ namespace Picking.Lib_Primavera
 
                 var putawayItems = new List<PutawayItem>();
                 var objListLin = _engine.Consulta(
-                    String.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id",
+                    String.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, Artigo.Descricao, Artigo.Volume, CDU_storageLocation, CDU_capacity, CDU_quantity, CDU_unit FROM TDU_PutawayItems INNER JOIN Artigo ON Artigo.Artigo LIKE CDU_itemId INNER JOIN ArmazemLocalizacoes ON Localizacao LIKE CDU_storageLocation WHERE CDU_putawayListId='{0}' ORDER BY CDU_id",
                     putawayList.Id));
 
                 for (; !objListLin.NoFim(); objListLin.Seguinte())
@@ -725,7 +725,9 @@ namespace Picking.Lib_Primavera
                     {
                         Item = new Item
                         {
-                            Id = objListLin.Valor("CDU_itemId")
+                            Id = objListLin.Valor("CDU_itemId"),
+                            Description = objListLin.Valor("Descricao"),
+                            Volume = objListLin.Valor("Volume")
                         },
                         StorageLocation = objListLin.Valor("CDU_storageLocation"),
                         Quantity = objListLin.Valor("CDU_quantity"),
@@ -766,7 +768,8 @@ namespace Picking.Lib_Primavera
 
             var putawayItems = new List<PutawayItem>();
             var objListLin = _engine.Consulta(
-                String.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, CDU_storageLocation, CDU_quantity, CDU_unit FROM TDU_PutawayItems WHERE CDU_putawayListId='{0}' ORDER BY CDU_id", putawayList.Id));
+                    String.Format("SELECT CDU_id, CDU_putawayListId, CDU_itemId, Artigo.Descricao, Artigo.Volume, CDU_storageLocation, CDU_capacity, CDU_quantity, CDU_unit FROM TDU_PutawayItems INNER JOIN Artigo ON Artigo.Artigo LIKE CDU_itemId INNER JOIN ArmazemLocalizacoes ON Localizacao LIKE CDU_storageLocation WHERE CDU_putawayListId='{0}' ORDER BY CDU_id",
+                    putawayList.Id));
 
             for (; !objListLin.NoFim(); objListLin.Seguinte())
             {
@@ -774,7 +777,9 @@ namespace Picking.Lib_Primavera
                 {
                     Item = new Item
                     {
-                        Id = objListLin.Valor("CDU_itemId")
+                        Id = objListLin.Valor("CDU_itemId"),
+                        Description = objListLin.Valor("Descricao"),
+                        Volume = objListLin.Valor("Volume")
                     },
                     StorageLocation = objListLin.Valor("CDU_storageLocation"),
                     Quantity = objListLin.Valor("CDU_quantity"),
@@ -898,12 +903,12 @@ namespace Picking.Lib_Primavera
             var d = Double.PositiveInfinity;
             string result = null;
 
-            var loc1 = Location.FromString(location);
+            var loc1 = LocationHelper.FromString(location);
 
             foreach (var s in locations)
             {
-                var loc2 = Location.FromString(s);
-                var dist = Location.GetDistance(loc1, loc2);
+                var loc2 = LocationHelper.FromString(s);
+                var dist = LocationHelper.GetDistance(loc1, loc2);
 
                 if (dist < d)
                 {
@@ -920,12 +925,12 @@ namespace Picking.Lib_Primavera
             var d = double.PositiveInfinity;
             ItemStock result = null;
 
-            var loc1 = Location.FromString(previousStockLocation.StorageLocation);
+            var loc1 = LocationHelper.FromString(previousStockLocation.StorageLocation);
 
             foreach (var s in stock)
             {
-                var loc2 = Location.FromString(s.StorageLocation);
-                var dist = Location.GetDistance(loc1, loc2);
+                var loc2 = LocationHelper.FromString(s.StorageLocation);
+                var dist = LocationHelper.GetDistance(loc1, loc2);
 
                 if (dist < d)
                 {
@@ -950,7 +955,5 @@ namespace Picking.Lib_Primavera
         public ErpBS Engine { get { return _engine;  } }
 
         #endregion
-
-
     }
 }

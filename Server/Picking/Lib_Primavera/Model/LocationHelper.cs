@@ -5,9 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace Picking.Lib_Primavera.Model
 {
-    public class Location
+    public class LocationHelper
     {
-        public static Location FromString(string location)
+        public static LocationHelper FromString(string location)
         {
             Contract.Requires(location != null);
 
@@ -19,10 +19,10 @@ namespace Picking.Lib_Primavera.Model
             int c = Int32.Parse(match.Groups[2].ToString(), CultureInfo.InvariantCulture);
             int s = Int32.Parse(match.Groups[3].ToString(), CultureInfo.InvariantCulture);
 
-            return new Location(a, c, s);
+            return new LocationHelper(a, c, s);
         }
 
-        public Location(int a, int c, int s)
+        public LocationHelper(int a, int c, int s)
         {
             Facility = a;
             Corridor = c;
@@ -34,7 +34,7 @@ namespace Picking.Lib_Primavera.Model
             return string.Format("A{0}.C{1}.S{2}", Facility, Corridor, Section);
         }
 
-        public static double GetDistance(Location loc1, Location loc2)
+        public static double GetDistance(LocationHelper loc1, LocationHelper loc2)
         {
             Contract.Requires(loc1 != null);
             Contract.Requires(loc2 != null);

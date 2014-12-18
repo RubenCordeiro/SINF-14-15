@@ -53,7 +53,7 @@ namespace Picking.Controllers
                     else
                     {
                         var locations = _company.ListStorageLocations()
-                            .Where(storageLocation => Location.FromString(storageLocation.Location) != null)
+                            .Where(storageLocation => LocationHelper.FromString(storageLocation.Location) != null)
                             .Select(storageLocation => storageLocation.Location)
                             .ToList();
 
@@ -152,7 +152,7 @@ namespace Picking.Controllers
 
         private IEnumerable<ItemStock> GetStock(string itemId)
         {
-            return _company.ListItemStock().Where(stock => stock.Item == itemId && Location.FromString(stock.StorageLocation) != null);
+            return _company.ListItemStock().Where(stock => stock.Item == itemId && LocationHelper.FromString(stock.StorageLocation) != null);
         }
 
         private readonly Company _company = new Company(Company.TargetCompany);

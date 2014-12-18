@@ -8,6 +8,8 @@
 
         public string StorageFacility { get; set; }
 
+        public double StorageCapacity { get; set; }
+
         public string Description { get; set; }
 
         public string IdParent { get; set; }
