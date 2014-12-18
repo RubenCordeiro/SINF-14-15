@@ -1,6 +1,6 @@
 angular.module('sinfApp.controllers', [])
 
-    .controller('AppCtrl', function ($scope, Restangular, AuthService, AlertPopupService, $ionicModal, $state) {
+    .controller('AppCtrl', function ($scope, $rootScope, $ionicLoading, Restangular, AuthService, AlertPopupService, $ionicModal, $state) {
 
         // Create the login modal that we will use later
         $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -26,6 +26,10 @@ angular.module('sinfApp.controllers', [])
         $scope.logout = function () {
             return AuthService.logout();
         };
+
+		$rootScope.$on('$stateChangeSuccess', function () {
+			$ionicLoading.hide();
+		});
     })
 
     .controller('HomeCtrl', function ($scope, Restangular, $ionicPopup) {
@@ -216,7 +220,9 @@ angular.module('sinfApp.controllers', [])
                 if (data.SkippedOrders.length > 0) {
                     $scope.skippedOrders = data.SkippedOrders;
                 }
-             });
+			}, function () {
+				$ionicLoading.hide();
+			});
         };
 
         var clamp = function(num, min, max) {
@@ -248,6 +254,7 @@ angular.module('sinfApp.controllers', [])
                 $ionicLoading.hide();
                 $state.go('app.picking');
             }, function (err) {
+				$ionicLoading.hide();
                 $ionicPopup.alert({
                     title: 'Error',
                     template: '<p>Error occurred: ' + JSON.stringify(err) + '</p>'
