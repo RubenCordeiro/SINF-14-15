@@ -145,7 +145,7 @@ angular.module('sinfApp.controllers', [])
                         return orderline.Picked;
                     }).length;
 
-                    order.Processed = Math.round(numProcessed / order.OrderLines.length) * 100;
+                    order.Processed = Math.round((numProcessed / order.OrderLines.length) * 100);
                 });
             });
         };
@@ -338,7 +338,7 @@ angular.module('sinfApp.controllers', [])
                         return supplyline.Putaway;
                     }).length;
 
-                    supply.Processed = Math.round(numProcessed / supply.SupplyLines.length) * 100;
+                    supply.Processed = Math.round((numProcessed / supply.SupplyLines.length) * 100);
                 });
             });
         };

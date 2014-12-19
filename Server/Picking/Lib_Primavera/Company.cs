@@ -556,7 +556,7 @@ namespace Picking.Lib_Primavera
             /* old, slow
             var doc = _engine.Comercial.Vendas.EditaID(order.Id);
             var fields = new StdBECampos();
-            fields.Insere(new StdBECampo { Nome = "CDU_Picked", Valor = 1 });
+            fields.Insere(new StdBECampo { Nome = "CDU_Picked", Valor = picked ? 1 : 0 });
             var line = doc.get_Linhas().get_Edita(orderLine.LineNo);
             line.set_CamposUtil(fields);
             _engine.Comercial.Vendas.Actualiza(doc);
