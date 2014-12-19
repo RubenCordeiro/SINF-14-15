@@ -5,7 +5,7 @@
                 <h2>{{item.Item.Id}}</h2>
                 <div class="item-note item-input">
                     <label>
-                        <input style="display: inline; width: 100px" ng-model="item.PickedQuantity" type="text" min="0"
+                        <input style="display: inline; width: 100px;border-width: 1px;  border-style: solid;border-color: #ddd;padding-left: 5px;" ng-model="item.PickedQuantity" type="text" min="0"
                                max="{{item.Quantity}}" step="0.1" ng-blur="inputPickedQuantityBlur(item)"
                                ng-focus="inputPickedQuantityFocus(item)">
                     </label>
